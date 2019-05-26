@@ -1,0 +1,199 @@
+/*背景*/
+.BackGround{
+    left:-10px;
+    background-image:url(../pictures/HomePagebackground.jpg);
+    background-size:100% 100%;
+    width:100%;
+    min-height:1000px;
+    background-attachment: fixed;
+    background-repeat:no-repeat;
+}
+.ContentPart{
+    position: relative;
+    top:0px;
+    margin:0 auto;
+    width: 1200px;
+    min-height: 800px;
+    background-color: rgba(255,255,255,0.4);
+    overflow: auto;
+    border-radius: 20px;
+}
+
+
+
+.PlaceHolder{
+    position: relative;
+    top:0px;
+    left:0px;
+    min-height: 100px;
+}
+.PlaceHolder_small{
+    position: relative;
+    top:0px;
+    left:0px;
+    min-height: 20px;
+}
+
+/*选择区*/
+.SelectPart{
+    position: relative;
+    top:0px;
+    left:0px;
+    min-height: 100px;
+}
+.SearchButton{
+    position:absolute;
+    left:1000px;
+    top:30px;
+    width: 150px;
+    height: 32px;
+    font-size: 22px;
+    border:none;
+    border-radius: 20px;
+    background-color: rgba(23, 48, 255, 0.5);
+    outline:none;
+}
+.SearchButton:hover{
+    background-color: rgba(23, 48, 255,0.7);
+    cursor: pointer;
+}
+.SelectProvince{
+    position:absolute;
+    left:50px;
+    top:30px;
+    width: 280px;
+    height: 32px;
+    font-size: 22px;
+    border-radius: 5px;
+    background-color: rgba(255,255,255,0.9);
+    border:none;
+    outline:none;
+}
+.SelectCity{
+    position:absolute;
+    left:350px;
+    top:30px;
+    width: 280px;
+    height: 32px;
+    font-size: 22px;
+    border-radius: 5px;
+    background-color: rgba(255,255,255,0.9);
+    border:none;
+    outline:none;
+}
+.SelectArea{
+    position:absolute;
+    left:650px;
+    top:30px;
+    width: 280px;
+    height: 32px;
+    font-size: 22px;
+    border-radius: 5px;
+    background-color: rgba(255,255,255,0.9);
+    border:none;
+    outline:none;
+}
+
+
+/*医生信息区*/
+.DoctorPart{
+    position: relative;
+    top:0px;
+    left:50px;
+    min-height: 1000px;
+    width: 1100px;
+    background-color: rgba(0,0,0,0.15);
+    border-radius: 20px;
+}
+
+.DoctorInformation{
+    position: relative;
+    top:0px;
+    left:50px;
+    min-height: 350px;
+    width: 1000px;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 20px;
+    border-left: 5px solid rgba(0, 0, 255,0.5);
+}
+
+.DoctorRealName_Label{
+    position: absolute;top:10px;left:20px;font-size: 25px;
+}
+.DoctorRealName{
+    position: absolute;top:10px;left:150px;font-size: 25px;
+}
+
+.DoctorPosition_Label{
+    position: absolute;top:60px;left:20px;font-size: 25px;
+}
+.DoctorPosition{
+    position: absolute;top:60px;left:150px;font-size: 25px;
+}
+
+.DoctorTelephone_Label{
+    position: absolute;top:110px;left:20px;font-size: 25px;
+}
+.DoctorTelephone{
+    position: absolute;top:110px;left:150px;font-size: 25px;
+}
+
+.DoctorDepartment_Label{
+    position: absolute;top:160px;left:20px;font-size: 25px;
+}
+.DoctorDepartment{
+    position: absolute;top:160px;left:150px;font-size: 25px;
+}
+
+.DoctorProvince_Label{
+    position: absolute;top:210px;left:20px;font-size: 25px;
+}
+.DoctorProvince{
+    position: absolute;top:210px;left:150px;font-size: 25px;
+}
+
+.DoctorCity_Label{
+    position: absolute;top:260px;left:20px;font-size: 25px;
+}
+.DoctorCity{
+    position: absolute;top:260px;left:150px;font-size: 25px;
+}
+
+.DoctorArea_Label{
+    position: absolute;top:310px;left:20px;font-size: 25px;
+}
+.DoctorArea{
+    position: absolute;top:310px;left:150px;font-size: 25px;
+}
+
+
+.DoctorQualification{
+    position: absolute;
+    top: 10px;
+    left: 500px;
+    width: 250px;
+    height: 330px;
+    border-radius: 5px;
+    background-color: rgba(0,0,0,0.3);
+    text-align: center;
+    display: table-cell;
+    vertical-align:middle;
+}
+.QualificationImage{
+    max-width: 250px;
+    max-height: 330px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

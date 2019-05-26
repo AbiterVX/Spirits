@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <link href="../css/TopPart.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/Post.css" rel="stylesheet" type="text/css"/>
+</head>
+<script type="text/javascript" src="../js/AuthorInformation.js"></script>
+<script>
+    function f_jump(index) {
+        var user_id=window.sessionStorage.getItem("user_id");
+        if(user_id!=null){
+            if(index==1){
+                window.location.href="Testing";
+            }
+            else if(index==2){
+                window.location.href="Community";
+            }
+            else if(index==3){
+                window.location.href="MySpace";
+            }
+            else if(index==4){
+                window.location.href="FindDoctor";
+            }
+        }
+        else{
+            window.location.href="SignIn";
+        }
+    }
+    onload =function f_getUserImage() {
+        if(window.sessionStorage["user_image"]!=null){
+            document.getElementById("user_image").src=window.sessionStorage["user_image"];
+        }
+        document.getElementById("author_username").innerText=window.sessionStorage["author_username"];
+        document.getElementById("author_image").src=window.sessionStorage["author_image"];
+        document.getElementById("theme_post_title").innerText='    '+window.sessionStorage["theme_post_title"];
+        document.getElementById("theme_post_profile").innerText='      '+window.sessionStorage["theme_post_profile"];
+        document.getElementById("illness_name").innerText='类型：'+window.sessionStorage["illness_name"]+'('+window.sessionStorage["illness_type_name"]+')';
+        document.getElementById("posting_time").innerText='发布时间：'+window.sessionStorage["posting_time"];
+        document.getElementById("update_time").innerText='更新时间：'+window.sessionStorage["update_time"];
+
+        f_getMaxPageIndex();
+    }
+
+    /*分页查询子贴*/
+    var page_index=1;
+    var max_page_index;
+    function f_previous() {
+        if(page_index-1>=1){
+            page_index-=1;
+            f_getSubPostInformation(page_index);
+        }
+    }
+    function f_next() {
+        if(page_index+1<=max_page_index){
+            page_index+=1;
+            f_getSubPostInformation(page_index);
+        }
+    }
+    function f_getMaxPageIndex() {
+        var data='{"theme_post_id":'+window.sessionStorage["theme_post_id"]+'}';
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Community/getSubPostNumber",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                max_page_index=jsondata;
+            },
+            error: function (err) {
+                //alert("getThemePostMaxPageIndex Wrong!");
+            }
+        });
+        page_index=1;
+        f_getSubPostInformation(page_index);
+    }
+    function f_getSubPostInformation(current_index) {
+        var data='{"theme_post_id":'+window.sessionStorage["theme_post_id"]+','+
+                '"page_index":'+page_index+'}';
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Community/getSubPostInformation",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                var SubPosts=document.getElementById("SubPosts");
+                var sub_post_information="";
+                for(var i=0;i<jsondata.length;i++){
+                    var author_image=f_getAuthorImage(jsondata[i]["user_id"]);
+                    var author_username=f_getAuthorUserName(jsondata[i]["user_id"]);
+                    var comment_number=f_getCommentNumber(jsondata[i]["sub_post_id"]);
+
+                    sub_post_information=sub_post_information+
+                        '<div id="sub_post_id_'+jsondata[i]["sub_post_id"]+'" class="SubPostPart">\n' +
+                        '     <div class="SubPostUserPart">\n' +
+                        '          <img class="SubPostUserImage" src="'+author_image+'">\n' +
+                        '          <div class="SubPostUserName">'+author_username+'</div>\n' +
+                        '          <div class="RowIndex">'+'楼层：'+jsondata[i]["row_index"]+'</div>'+
+                        '     </div>\n' +
+                        '     <div class="SubPostContent">'+'      '+jsondata[i]["sub_post_content"]+'</div>\n' +
+                        '     <div class="CommentBottomPart">'+
+                        '          <div class="SubPostPostingTime">'+'发布时间：'+jsondata[i]["posting_time"]+'</div>\n' +
+                        '          <div class="CommentNumberButton" onclick="f_getCommentInformation(\''+jsondata[i]["sub_post_id"]+'\')">'+'评论数：'+comment_number+'</div>'+
+                        '     </div>'+
+                        '</div>';
+
+                }
+                SubPosts.innerHTML=sub_post_information;
+            },
+            error: function (err) {
+                alert("Wrong!");
+            }
+        });
+
+        var current=document.getElementById("current");
+        current.innerText=String(current_index)+'/'+String(max_page_index)+'页';
+    }
+    /*评论*/
+    function f_getCommentNumber(sub_post_id) {
+        var data='{"sub_post_id":'+sub_post_id+'}';
+        var CommentNumber=-1;
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Community/getCommentNumber",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                CommentNumber=jsondata;
+            },
+            error: function (err) {
+                //alert("f_getCommentNumber Wrong!");
+            }
+        });
+        return CommentNumber;
+    }
+    function f_getCommentInformation(sub_post_id) {
+        var current_comment_part=document.getElementById("CommentPart_"+sub_post_id);
+        if(current_comment_part==null){
+            var comments='';
+            var data='{"sub_post_id":'+sub_post_id+'}';
+            $.ajax({
+                type:"post",
+                dataType:"json",
+                url:"/Community/getCommentInformation",
+                data:data,
+                processData :false,
+                contentType:"application/json",
+                async:false,
+                success:function (jsondata) {
+                    comments=comments+
+                            '<div class="PublishCommentPart">' +
+                            '   <div class="PublishCommentTitle">发表评论</div>'+
+                            '   <textarea id="comment_content_'+i+'" class="PublishCommentContent"></textarea>'+
+                            '   <button class="PublishCommentButton" onclick="f_publishComment(\''+sub_post_id+'\','+i+')">发表</button>'+
+                            '</div>'
+                    for(var i=0;i<jsondata.length;i++) {
+                        var author_username = f_getAuthorUserName(jsondata[i]["user_id"]);
+                        var author_image = f_getAuthorImage(jsondata[i]["user_id"]);
+
+                        comments=comments+
+                            '<div class="Comment">\n' +
+                            '     <div class="CommentUserPart">\n' +
+                            '          <img class="CommentUserImage" src="'+author_image+'">\n' +
+                            '          <div class="CommentUserName">'+author_username+'</div>\n' +
+                            '     </div>\n' +
+                            '     <div class="CommentContent">'+'      '+jsondata[i]["comment_content"]+'</div>\n' +
+                            '     <div class="CommentPostingTime">'+'发布时间：'+jsondata[i]["posting_time"]+'</div>\n' +
+                            '</div>\n';
+
+                    }
+                },
+                error: function (err) {
+                    //alert("f_getCommentNumber Wrong!");
+                }
+            });
+            /*
+            <div class="CommentPart">
+                        <div class="Comment">
+                            <div class="CommentUserPart">
+                                <img class="CommentUserImage" src="../imgIndex/users.png">
+                                <div class="CommentUserName">CommentUserName</div>
+                            </div>
+                            <div class="CommmentContent">    CommmentContentCommmentContentCommmentContentCommmentContentCommmentContentCommmentContentCommmentContentCommmentContentCommmentContentCommmentContent</div>
+                            <div class="CommentPostingTime">CommentPostingTime</div>
+                        </div>
+                    </div>
+             */
+            var comment_part=document.createElement("div");
+            comment_part.id="CommentPart_"+sub_post_id;
+            comment_part.className="CommentPart";
+            comment_part.innerHTML=comments;
+            document.getElementById("sub_post_id_"+sub_post_id).after(comment_part);
+        }
+        else{
+            current_comment_part.parentElement.removeChild(current_comment_part);
+        }
+    }
+
+    /*发表子贴*/
+    function f_publishSubPost() {
+        var sub_post_content=document.getElementById("sub_post_content");
+        if(sub_post_content.value!=""){
+            var data='{"theme_post_id":"'+window.sessionStorage["theme_post_id"]+'",' +
+                '"user_id":"'+window.sessionStorage["user_id"]+'",' +
+                '"sub_post_content":"'+sub_post_content.value+'"}';
+            $.ajax({
+                type:"post",
+                dataType:"json",
+                url:"/Community/insertSubPost",
+                data:data,
+                processData :false,
+                contentType:"application/json",
+                async:false,
+                success:function (jsondata) {
+                },
+                error: function (err) {
+                    //alert("insertThemePost Wrong!");
+                }
+            });
+            window.location.href="Post";
+        }
+    }
+    /*发表评论*/
+    function f_publishComment(sub_post_id,index) {
+        var comment_content=document.getElementById("comment_content_"+index);
+        var data='{"sub_post_id":"'+sub_post_id+'",' +
+            '"user_id":"'+window.sessionStorage["user_id"]+'",' +
+            '"comment_content":"'+comment_content.value+'"}';
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Community/insertComment",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+            },
+            error: function (err) {
+                //alert("insertThemePost Wrong!");
+            }
+        });
+        window.location.href="Post";
+    }
+</script>
+<body>
+    <div class="TopPart">
+    <div class="MainLabelPart">
+        <a  href="/" class="MainLabel" >- SPIRITS -</a>
+    </div>
+    <div class="SubTagPart">
+        <a class="SubTag" style="left:0px;"   onclick="f_jump(1)">疾病自检</a>
+        <a class="SubTag" style="left:200px;color:#9f4248;background-color: rgba(255, 255, 255, 1);" onclick="f_jump(2)">互助社区</a>
+        <a class="SubTag" style="left:400px;" onclick="f_jump(3)">个人空间</a>
+        <a class="SubTag" style="left:600px;" onclick="f_jump(4)">联系医生</a>
+    </div>
+    <div class="UserPart">
+        <a href="/SignIn">
+            <img id="user_image" class="UserImage" src="../imgIndex/users.png"  />
+        </a>
+    </div>
+</div>
+
+    <div class="BackGround">
+        <div style="position: relative;min-height: 100px;"></div>
+        <div class="ContentPart">
+            <div class="ThemePostPart">
+                <div style="position: relative;top: 0px;left:0px;">
+                    <div id="theme_post_title" class="ThemePostTitle"></div>
+                    <img id="author_image" class="ThemePostAuthorImage">
+                    <div id="author_username" class="ThemePostAuthorUserName"></div>
+                    <div id="theme_post_profile" class="ThemePostProfile"></div>
+                </div>
+                <div style="position: relative;top: 0px;left:0px;">
+                    <div id="illness_name" class="ThemePostIllness"></div>
+                    <div id="posting_time" class="ThemePostPostingTime"></div>
+                    <div id="update_time" class="ThemePostUpdateTime"></div>
+                </div>
+            </div>
+            <div id="SubPosts" style="position: relative;top: 0px;left:0px;min-height: 300px;">
+                <!--<div class="SubPostPart">
+                    <div class="SubPostUserPart">
+                        <img class="SubPostUserImage" src="../imgIndex/users.png">
+                        <div class="SubPostUserName"></div>
+                    </div>
+                    <div class="SubPostContent"></div>
+                    <div class="SubPostPostingTime"></div>
+                </div>-->
+            </div>
+
+            <div class="CommentPlaceHolder"></div>
+            <div class="CommentPlaceHolder"></div>
+            <div id="index_part" class="IndexPart">
+                <div id="previous" style="position: absolute;left: 300px;top: 0px;">
+                    <button class="IndexButton" onclick="f_previous()">上一页</button>
+                </div>
+                <div id="current" class="IndexLabel" style="position: absolute;left: 450px;top: 0px;">0/0页</div>
+                <div id="next" style="position: absolute;left: 580px;top: 0px;">
+                    <button class="IndexButton" onclick="f_next()">下一页</button>
+                </div>
+            </div>
+
+        </div>
+        <div style="position: relative;min-height: 50px;"></div>
+        <div class="PublishSubPostPart">
+            <div class="PublishSubPostTitle">发表子贴</div>
+            <div class="PublishSubPostContentLabel">内容：</div>
+            <textarea id="sub_post_content" class="PublishSubPostContent"></textarea>
+            <button class="PublishSubPostButton" onclick="f_publishSubPost()">发布</button>
+        </div>
+
+        <div style="position: relative;min-height: 100px;"></div>
+    </div>
+
+</body>
+</html>

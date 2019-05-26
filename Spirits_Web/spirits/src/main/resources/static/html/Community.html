@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Community</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <link href="../css/TopPart.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/Community.css" rel="stylesheet" type="text/css"/>
+</head>
+<script>
+    function f_jump(index) {
+        var user_id=window.sessionStorage.getItem("user_id");
+        if(user_id!=null){
+            if(index==1){
+                window.location.href="Testing";
+            }
+            else if(index==2){
+                window.location.href="Community";
+            }
+            else if(index==3){
+                window.location.href="MySpace";
+            }
+            else if(index==4){
+                window.location.href="FindDoctor";
+            }
+        }
+        else{
+            window.location.href="SignIn";
+        }
+    }
+    onload =function f_getUserImage() {
+        if(window.sessionStorage["user_image"]!=null){
+            document.getElementById("user_image").src=window.sessionStorage["user_image"];
+        }
+        f_getMaxPageIndex();
+    }
+
+    //分页查询
+    var page_index=1;
+    var max_page_index;
+    function f_previous() {
+        if(page_index-1>=1){
+            page_index-=1;
+            f_getPostInformation(page_index);
+        }
+    }
+    function f_next() {
+        if(page_index+1<=max_page_index){
+            page_index+=1;
+            f_getPostInformation(page_index);
+        }
+    }
+
+    function f_getMaxPageIndex() {
+        var illness_type=document.getElementById("illness_type");
+        var data='{"illness_type":'+illness_type.value+'}';
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Community/getThemePostMaxPageIndex",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                max_page_index=jsondata;
+                //alert(max_page_index);
+            },
+            error: function (err) {
+                //alert("getThemePostMaxPageIndex Wrong!");
+            }
+        });
+        page_index=1;
+        f_getPostInformation(page_index);
+    }
+    function f_getPostInformation(current_index){
+        var illness_type=document.getElementById("illness_type");
+        var data='{"illness_type":'+illness_type.value+',"page_index":'+ current_index+'}';
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Community/getThemePostInformation",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                //alert(JSON.stringify(jsondata));
+                var PostPart=document.getElementById("PostPart");
+                var post_information="";
+
+                for(var i=0;i<jsondata.length;i++){
+                    var author_username=f_getAuthorUserName(jsondata[i]["user_id"]);
+                    var author_image=f_getAuthorImage(jsondata[i]["user_id"]);
+                    post_information=post_information+
+                        '<div class="ThemePost" ' +
+                        'onclick="f_getThemePost('+jsondata[i]["theme_post_id"]+
+                                                 ',\''+jsondata[i]["user_id"]+'\',\''+author_username+'\',\''+author_image+'\''+
+                                                 ',\''+jsondata[i]["theme_post_title"]+'\',\''+jsondata[i]["theme_post_profile"]+'\''+
+                                                 ',\''+jsondata[i]["illness_name"]+'\',\''+jsondata[i]["illness_type_name"]+'\''+
+                                                 ',\''+jsondata[i]["posting_time"]+'\',\''+jsondata[i]["update_time"]+'\''+
+                        ')">\n' +
+                        '    <img class="AuthorImage" src="'+author_image+'">'+
+                        '    <div class="ThemePostUserPart">'+author_username+'</div>\n' +
+                        '    <div class="ThemePostTitle">'+'      '+jsondata[i]["theme_post_title"]+'</div>\n' +
+                        '    <div class="ThemePostIllness">'+'类别：'+jsondata[i]["illness_name"]+'('+jsondata[i]["illness_type_name"]+')'+'</div>\n' +
+                        '    <div class="ThemePostPostingTime">'+'发帖时间：'+jsondata[i]["posting_time"]+'</div>\n' +
+                        '    <div class="ThemePostUpdateTime">'+'最近更新：'+jsondata[i]["update_time"]+'</div>\n' +
+                        '</div>'
+                }
+                //alert(post_information);
+                PostPart.innerHTML=post_information;
+            },
+            error: function (err) {
+                //alert("getThemePostInformation Wrong!");
+            }
+        });
+        var current=document.getElementById("current");
+        current.innerText=String(current_index)+'/'+String(max_page_index)+'页';
+    }
+
+    //进入具体题目页面
+    function f_getThemePost(theme_post_id,
+                            author_id,author_username,author_image,
+                            theme_post_title,theme_post_profile,
+                            illness_name,illness_type_name,
+                            posting_time,update_time ) {
+        window.sessionStorage["theme_post_id"]=theme_post_id;
+        window.sessionStorage["author_id"]=author_id;
+        window.sessionStorage["author_username"]=author_username;
+        window.sessionStorage["author_image"]=author_image;
+        window.sessionStorage["theme_post_title"]=theme_post_title;
+        window.sessionStorage["theme_post_profile"]=theme_post_profile;
+        window.sessionStorage["illness_name"]=illness_name;
+        window.sessionStorage["illness_type_name"]=illness_type_name;
+        window.sessionStorage["posting_time"]=posting_time;
+        window.sessionStorage["update_time"]=update_time;
+        //alert("!!");
+        window.location.href="Post";
+    }
+
+    // 主题帖作者信息
+    function f_getAuthorUserName(user_id) {
+        var author_id="";
+        var data='{"user_id":"'+user_id+'"}';
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/MySpace/getUserName",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                author_id=jsondata["user_name"];
+            },
+            error: function (err) {
+                //alert("getAuthorUserName Wrong!");
+            }
+        });
+        return author_id;
+    }
+    function f_getAuthorImage(user_id) {
+        var image_name='image/'+user_id+'.txt';
+        var author_image="";
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/downloadFile",
+            data:image_name,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                author_image=jsondata['data'];
+                if(author_image==""){
+                    author_image="../imgIndex/users.png";
+                }
+            },
+            error: function (err) {
+                //alert(err);
+            }
+        })
+        return author_image;
+    }
+
+    function f_publishPost() {
+        //全部疾病测试 测试简介blblblblblblblbl。。。
+        var user_id=window.sessionStorage.getItem("user_id");
+        //alert(user_id);
+        var theme_post_title=document.getElementById("Publish_ThemePostTitle");
+        var theme_post_profile=document.getElementById("Publish_ThemePostProfile");
+        var illness_id=document.getElementById("Publish_IllnessName");
+        var illness_type_id=document.getElementById("Publish_IllnessTypeName");
+
+        //alert(theme_post_title.value);
+        if(theme_post_title.value!="" ){
+            var data='{"user_id":"'+user_id+'","' +
+                     'theme_post_title":"'+theme_post_title.value+'","' +
+                     'theme_post_profile":"'+theme_post_profile.value+'","' +
+                     'illness_id":"'+illness_id.value+'","' +
+                     'illness_type_id":"'+illness_type_id.value+'"}';
+            //alert(data);
+            $.ajax({
+                type:"post",
+                dataType:"json",
+                url:"/Community/insertThemePost",
+                data:data,
+                processData :false,
+                contentType:"application/json",
+                async:false,
+                success:function (jsondata) {
+
+                },
+                error: function (err) {
+                    //alert("insertThemePost Wrong!");
+                }
+            });
+            window.location.href="Community";
+        }
+    }
+</script>
+<body>
+    <div class="TopPart">
+        <div class="MainLabelPart">
+            <a  href="/" class="MainLabel" >- SPIRITS -</a>
+        </div>
+        <div class="SubTagPart">
+            <a class="SubTag" style="left:0px;"   onclick="f_jump(1)">疾病自检</a>
+            <a class="SubTag" style="left:200px;color:#9f4248;background-color: rgba(255, 255, 255, 1);" onclick="f_jump(2)">互助社区</a>
+            <a class="SubTag" style="left:400px;" onclick="f_jump(3)">个人空间</a>
+            <a class="SubTag" style="left:600px;" onclick="f_jump(4)">联系医生</a>
+        </div>
+        <div class="UserPart">
+            <a href="/SignIn">
+                <img id="user_image" class="UserImage" src="../imgIndex/users.png"  />
+            </a>
+        </div>
+    </div>
+
+    <div class="BackGround">
+        <div class="ContentPart">
+            <select id="illness_type" class="SelectIllnessType">
+                <option value="0">全部疾病</option>
+                <option value="1">成年人常见疾病</option>
+                <option value="2">儿童常见疾病</option>
+                <option value="3">青少年常见疾病</option>
+                <option value="4">生理心理疾病</option>
+            </select>
+            <button class="SelectButton" onclick="f_getMaxPageIndex()">搜索</button>
+
+            <div id="PostPart" class="PostPart">
+                <!--<div class="ThemePost">
+                    <div class="ThemePostTitle"></div>
+                    <div class="ThemePostProfile"></div>
+                    <div class="ThemePostIllness"></div>
+                    <div class="ThemePostPostingTime"></div>
+                    <div class="ThemePostUpdateTime"></div>
+                </div>-->
+            </div>
+
+            <div id="index_part" class="IndexPart">
+                <div id="previous" style="position: absolute;left: 300px;top: 0px;">
+                    <button class="IndexButton" onclick="f_previous()">上一页</button>
+                </div>
+                <div id="current" class="IndexLabel" style="position: absolute;left: 450px;top: 0px;">0/0页</div>
+                <div id="next" style="position: absolute;left: 580px;top: 0px;">
+                    <button class="IndexButton" onclick="f_next()">下一页</button>
+                </div>
+            </div>
+        </div>
+        <div class="Publish_Post">
+            <div class="PublishPostTitle">发表主题帖</div>
+            <div class="TypeLabel">类别：</div>
+            <select id="Publish_IllnessName" class="Publish_IllnessName">
+                <option value="0" selected>综合</option>
+                <option value="1">焦虑症</option>
+                <option value="2">洁癖</option>
+                <option value="3">神经衰弱</option>
+                <option value="4">学习技能发育障碍</option>
+                <option value="5">抑郁症</option>
+                <option value="6">自闭症</option>
+                <option value="7">分离性障碍</option>
+                <option value="8">恐怖症</option>
+                <option value="9">网络综合症</option>
+                <option value="10">病态怀旧心理</option>
+                <option value="11">反应性精神病</option>
+                <option value="12">忧郁症</option>
+            </select>
+            <select id="Publish_IllnessTypeName" class="Publish_IllnessTypeName">
+                <option value="0" selected>全部疾病</option>
+                <option value="1">成年人常见疾病</option>
+                <option value="2">儿童常见疾病</option>
+                <option value="3">青少年常见疾病</option>
+                <option value="4">生理心理疾病</option>
+            </select>
+            <button class="PublishPostButton" onclick="f_publishPost()">发布</button>
+
+            <div class="TitleLabel">标题：</div>
+            <input type="text"  id="Publish_ThemePostTitle" class="Publish_ThemePostTitle">
+            <div class="ProfileLabel">简介：</div>
+            <textarea id="Publish_ThemePostProfile" class="Publish_ThemePostProfile"></textarea>
+        </div>
+    </div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Spirit</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <link href="../css/TopPart.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/MySpace.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<style type="text/css">
+
+</style>
+<script>
+    onload =function init(){
+        f_getUserInformation();
+        /*记录信息*/
+        f_getTestingRecordInformation();
+        f_getThemePostInformation();
+        f_getSubPostInformation();
+        f_getCommentInformation();
+    }
+    function f_jump(index) {
+        var user_id=window.sessionStorage.getItem("user_id");
+        if(user_id!=null){
+            if(index==1){
+                window.location.href="Testing";
+            }
+            else if(index==2){
+                window.location.href="Community";
+            }
+            else if(index==3){
+                window.location.href="MySpace";
+            }
+            else if(index==4){
+                window.location.href="FindDoctor";
+            }
+        }
+        else{
+            window.location.href="SignIn";
+        }
+    }
+    // 地区信息
+    var area_data;
+    function f_getAreaInformation() {
+        var data='{"area":""}';
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/FindDoctor/getAreaInformation",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                //alert(JSON.stringify(jsondata));
+                area_data=jsondata;
+                var user_province=document.getElementById("user_province");
+                var options='<option value="-1">全国</option>';
+                for(var i=0;i<jsondata.length;i++){
+                    options=options+
+                        '<option value="'+i+'">'+ jsondata[i]["name"]+'</option>';
+                }
+                user_province.innerHTML=options;
+                f_getCity();
+            },
+            error: function (err) {
+                alert("Wrong!");
+            }
+        })
+    }
+    function f_getCity() {
+        var user_province_index=document.getElementById("user_province").value;
+        var user_city=document.getElementById("user_city");
+        var options='<option value="-1">所有市</option>';
+        if(user_province_index!=-1){
+            for(var i=0;i<area_data[user_province_index]["city"].length;i++){
+                //alert(JSON.stringify(area_data[current_province_index]["city"]));
+                options=options+
+                    '<option value="'+i+'">'+ area_data[user_province_index]["city"][i]["name"]+'</option>';
+            }
+        }
+        user_city.innerHTML=options;
+        f_getArea();
+    }
+    function f_getArea() {
+        var user_province_index=document.getElementById("user_province").value;
+        var user_city_index=document.getElementById("user_city").value;
+        var user_area=document.getElementById("user_area");
+        var options='<option value="-1">所有区</option>';
+        if(user_city_index!=-1){
+            for(var i=0;i<area_data[user_province_index]["city"][user_city_index]["area"].length;i++){
+                options=options+
+                    '<option value="'+i+'">'+ area_data[user_province_index]["city"][user_city_index]["area"][i]+'</option>';
+            }
+        }
+        user_area.innerHTML=options;
+    }
+
+    /*搜索自检信息*/
+    function f_displayTestingRecord() {
+        var record_testing=document.getElementById("record_testing");
+        if (record_testing.style.display=="none"){
+            record_testing.style.display="";
+        }
+        else{
+            record_testing.style.display="none"
+        }
+    }
+    function f_getTestingRecordInformation() {
+        var data='{"user_id":"'+window.sessionStorage.getItem("user_id")+'"}';
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Testing/getTestingRecordInformation",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                //alert(JSON.stringify(jsondata));
+                var record_testing=document.getElementById("record_testing");
+                var records='<div class="RecordPlaceholder_small"></div>\n';
+                for(var i=0;i<jsondata.length;i++){
+                    records=records+
+                        '<div class="Record_Testing">\n' +
+                        '     <div class="TestingID">ID：'+jsondata[i]["testing_id"]+'</div>\n' +
+                        '     <button class="DeleteRecordButton" onclick="f_deleteTestingRecordInformation('+jsondata[i]["testing_record_id"]+')">删除</button>\n' +
+                        '     <div class="RecordPlaceholder_middle"></div>\n' +
+                        '     <div class="TestingProfile">简介：'+jsondata[i]["testing_profile"]+'</div>\n' +
+                        '     <div class="RecordPlaceholder_small"></div>\n' +
+                        '     <div class="TestingResult">结果：'+jsondata[i]["testing_result"]+'</div>\n' +
+                        '     <div class="RecordPlaceholder_small"></div>\n' +
+                        '     <div class="IllnessType">类型：'+jsondata[i]["illness_name"]+'('+jsondata[i]["illness_type_name"]+')</div>\n' +
+                        '     <div class="RecordPlaceholder_small"></div>\n' +
+                        '     </div>\n' +
+                        '<div class="RecordPlaceholder_small"></div>';
+                }
+                record_testing.innerHTML=records;
+            },
+            error: function (err) {
+                //alert("Wrong!");
+            }
+        })
+    }
+    function f_deleteTestingRecordInformation(testing_record_id) {
+        var data='{"testing_record_id":'+testing_record_id+'}';
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Testing/deleteTestingRecordInformation",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+
+            },
+            error: function (err) {
+                //alert("Wrong!");
+            }
+        })
+        window.location.href="MySpace";
+    }
+    /*搜索主题帖信息*/
+    function f_displayThemePostRecord() {
+        var theme_post_record=document.getElementById("theme_post_record");
+        if (theme_post_record.style.display=="none"){
+            theme_post_record.style.display="";
+        }
+        else{
+            theme_post_record.style.display="none"
+        }
+    }
+    function f_getThemePostInformation() {
+        var data='{"user_id":"'+window.sessionStorage.getItem("user_id")+'"}';
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Community/getUserThemePostInformation",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                //alert(JSON.stringify(jsondata));
+                var theme_post_record=document.getElementById("theme_post_record");
+                var records='<div class="RecordPlaceholder_small"></div>\n';
+                for(var i=0;i<jsondata.length;i++){
+                    records=records+
+                        '<div class="Record_ThemePost">\n' +
+                        '     <div class="RecordPlaceholder_small"></div>\n' +
+                        '     <select id="illness_id_'+String(i)+'" class="ThemePostIllnessName"></select>\n' +
+                        '     <select id="illness_type_id_'+String(i)+'" class="ThemePostIllnessTypeName"></select>\n' +
+                        '     <button class="ThemePostUpdateButton" onclick="f_updateThemePostInformation('+jsondata[i]["theme_post_id"]+','+i+')">修改</button>\n' +
+                        '     <button class="DeleteRecordButton" onclick="f_deleteThemePostInformation('+jsondata[i]["theme_post_id"]+')">删除</button>\n' +
+                        '     <div class="RecordPlaceholder_middle"></div>\n' +
+                        '     <div class="RecordPlaceholder_small"></div>\n' +
+                        '     <input id="title_'+String(i)+'" type="text" class="ThemePostTitle" value="'+jsondata[i]["theme_post_title"]+'">\n' +
+                        '     <div class="RecordPlaceholder_small"></div>\n' +
+                        '     <textarea id="profile_'+String(i)+'" class="ThemePostProfile">'+jsondata[i]["theme_post_profile"]+'</textarea>\n' +
+                        '     <div class="RecordPlaceholder_small"></div>\n' +
+                        '     <div class="ThemePostPostingTime">发布时间：'+jsondata[i]["posting_time"]+'</div>\n' +
+                        '     <div class="RecordPlaceholder_small"></div>\n' +
+                        '</div>\n' +
+                        '<div class="RecordPlaceholder_small"></div>'
+                }
+                theme_post_record.innerHTML=records;
+                for(var i=0;i<jsondata.length;i++){
+                    var themepost_illness=document.getElementById("illness_id_"+String(i));
+                    if(themepost_illness==null){
+                        alert("null!")
+                    }
+                    themepost_illness.innerHTML='<option value="0" selected>综合</option>\n' +
+                        '<option value="1">焦虑症</option>\n' +
+                        '<option value="2">洁癖</option>\n' +
+                        '<option value="3">神经衰弱</option>\n' +
+                        '<option value="4">学习技能发育障碍</option>\n' +
+                        '<option value="5">抑郁症</option>\n' +
+                        '<option value="6">自闭症</option>\n' +
+                        '<option value="7">分离性障碍</option>\n' +
+                        '<option value="8">恐怖症</option>\n' +
+                        '<option value="9">网络综合症</option>\n' +
+                        '<option value="10">病态怀旧心理</option>\n' +
+                        '<option value="11">反应性精神病</option>\n' +
+                        '<option value="12">忧郁症</option>\n'
+                    themepost_illness.value=jsondata[i]["illness_id"];
+                    var themepost_illnesstype=document.getElementById("illness_type_id_"+String(i));
+                    themepost_illnesstype.innerHTML='<option value="0" selected>全部疾病</option>\n' +
+                        '<option value="1">成年人常见疾病</option>\n' +
+                        '<option value="2">儿童常见疾病</option>\n' +
+                        '<option value="3">青少年常见疾病</option>\n' +
+                        '<option value="4">生理心理疾病</option>\n'
+                    themepost_illnesstype.value=jsondata[i]["illness_type_id"];
+                }
+            },
+            error: function (err) {
+                //alert("Wrong!");
+            }
+        })
+    }
+    function f_deleteThemePostInformation(theme_post_id) {
+        var data='{"theme_post_id":'+theme_post_id+'}';
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Community/deleteThemePost",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+            },
+            error: function (err) {
+                //alert("Wrong!");
+            }
+        })
+        window.location.href="MySpace";
+    }
+    function f_updateThemePostInformation(theme_post_id,index) {
+        var title=document.getElementById("title_"+String(index)).value;
+        var profile=document.getElementById("profile_"+String(index)).value;
+        var illness_id=document.getElementById("illness_id_"+String(index)).value;
+        var illness_type_id=document.getElementById("illness_type_id_"+String(index)).value;
+
+        var data='{"theme_post_id":"'+theme_post_id+'",' +
+            '"theme_post_title":"'+title+'",' +
+            '"theme_post_profile":"'+profile+'",' +
+            '"illness_id":"'+illness_id+'",' +
+            '"illness_type_id":"'+illness_type_id+'"}';
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Community/updateThemePost",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+            },
+            error: function (err) {
+                //alert("Wrong!");
+            }
+        })
+        window.location.href="MySpace";
+    }
+    /*搜索子贴信息*/
+    function f_displaySubPostRecord() {
+        var theme_post_record=document.getElementById("sub_post_record");
+        if (theme_post_record.style.display=="none"){
+            theme_post_record.style.display="";
+        }
+        else{
+            theme_post_record.style.display="none"
+        }
+    }
+    function f_getSubPostInformation() {
+        var data='{"user_id":"'+window.sessionStorage.getItem("user_id")+'"}';
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Community/getUserSubPostInformation",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                var sub_post_record=document.getElementById("sub_post_record");
+                var records='<div class="RecordPlaceholder_small"></div>\n';
+                for(var i=0;i<jsondata.length;i++) {
+                    records = records +
+                        '<div class="Record_SubPost">\n' +
+                        '     <div class="RecordPlaceholder_middle"></div>\n' +
+                        '     <div class="SubPostIllness">类型：'+jsondata[i]["illness_name"]+'('+jsondata[i]["illness_type_name"]+')</div>\n' +
+                        '     <div class="SubPostPostingTime">发布时间：'+jsondata[i]["posting_time"]+'</div>\n' +
+                        '     <button class="DeleteRecordButton" onclick="f_deleteSubPostInformation('+jsondata[i]["sub_post_id"]+')">删除</button>\n' +
+                        '     <div class="SubPostThemePostTitle">标题：'+jsondata[i]["theme_post_title"]+'</div>\n' +
+                        '     <div class="RecordPlaceholder_small"></div>\n' +
+                        '     <div class="SubPostContent">内容：'+jsondata[i]["sub_post_content"]+'</div>\n' +
+                        '     <div class="RecordPlaceholder_small"></div>\n' +
+                        '</div>\n' +
+                        '<div class="RecordPlaceholder_small"></div>';
+                }
+                sub_post_record.innerHTML=records;
+            },
+            error: function (err) {
+                alert("Wrong!");
+            }
+        })
+    }
+    function f_deleteSubPostInformation(sub_post_id) {
+        var data='{"sub_post_id":'+sub_post_id+'}';
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Community/deleteSubPost",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+            },
+            error: function (err) {
+                //alert("Wrong!");
+            }
+        })
+        window.location.href="MySpace";
+    }
+
+    /*搜索评论信息*/
+    function f_displayCommentRecord() {
+        var theme_post_record=document.getElementById("comment_record");
+        if (theme_post_record.style.display=="none"){
+            theme_post_record.style.display="";
+        }
+        else{
+            theme_post_record.style.display="none"
+        }
+    }
+    function f_getCommentInformation() {
+        var data='{"user_id":"'+window.sessionStorage.getItem("user_id")+'"}';
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Community/getUserCommentInformation",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                var comment_record=document.getElementById("comment_record");
+                var records='<div class="RecordPlaceholder_small"></div>\n';
+                for(var i=0;i<jsondata.length;i++) {
+                    records = records +
+                        '<div class="Record_Comment">\n' +
+                        '     <div class="RecordPlaceholder_middle"></div>\n' +
+                        '     <div class="CommentIllness">类型：'+jsondata[i]["illness_name"]+'('+jsondata[i]["illness_type_name"]+')</div>\n' +
+                        '     <div class="CommentPostingTime">发布时间：'+jsondata[i]["posting_time"]+'</div>\n' +
+                        '     <button class="DeleteRecordButton" onclick="f_deleteCommentInformation('+jsondata[i]["comment_id"]+')">删除</button>\n' +
+                        '     <div class="CommentThemePostTitle">标题：'+jsondata[i]["theme_post_title"]+'</div>\n' +
+                        '     <div class="RecordPlaceholder_small"></div>\n' +
+                        '     <div class="CommentContent">内容：'+jsondata[i]["comment_content"]+'</div>\n' +
+                        '     <div class="RecordPlaceholder_small"></div>\n' +
+                        '</div>\n' +
+                        '<div class="RecordPlaceholder_small"></div>';
+                }
+                comment_record.innerHTML=records;
+
+            },
+            error: function (err) {
+                alert("Wrong!");
+            }
+        })
+    }
+    function f_deleteCommentInformation(comment_id) {
+        var data='{"comment_id":'+comment_id+'}';
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Community/deleteComment",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+            },
+            error: function (err) {
+                //alert("Wrong!");
+            }
+        })
+        window.location.href="MySpace";
+    }
+
+
+    // DoctorQualification
+    function f_goToDoctorQualification() {
+        window.location.href="DoctorQualification";
+    }
+</script>
+<body>
+    <div class="TopPart">
+        <div class="MainLabelPart">
+            <a  href="/" class="MainLabel" >- SPIRITS -</a>
+        </div>
+        <div class="SubTagPart">
+            <a class="SubTag" style="left:0px;"   onclick="f_jump(1)">疾病自检</a>
+            <a class="SubTag" style="left:200px;" onclick="f_jump(2)">互助社区</a>
+            <a class="SubTag" style="left:400px;color:#9f4248;background-color: rgba(255, 255, 255, 1);" onclick="f_jump(3)">个人空间</a>
+            <a class="SubTag" style="left:600px;" onclick="f_jump(4)">联系医生</a>
+        </div>
+        <div class="UserPart">
+            <a href="/SignIn">
+                <img id="user_image" class="UserImage" src="../imgIndex/users.png"  />
+            </a>
+    </div>
+
+    </div>
+    <div class="BackGround">
+        <div class="UserInformationPart" id="user_part" >
+            <div class="AdvancedInformation" id="advanced_information" >
+                <div style="position:relative;top:0px;left:0px;">
+                    <img id="user_image2" class="UserInformationImage" src="../imgIndex/users.png"  />
+                </div>
+                <div style="position:relative;top:10px;left:0px;">
+                    <div id="user_type" class="MySpace_TextArea_Label" style="position:relative;top:0px;left:0px;">用户类型：普通用户</div>
+                </div>
+                <div style="position:relative;top:30px;left:0px;">
+                    <button class="MySpace_Button" style="position:absolute;top:0px;left:0px;" onclick="f_updatePassword_visable()">修改密码</button>
+                    <button class="MySpace_Button" style="position:absolute;top:50px;left:0px;" onclick="f_updateUserInformation()">修改信息</button>
+                    <div  style="position:absolute;top:100px;left:0px;">
+                        <input type="button" value="选择头像" class="MySpace_Button" onclick="f_file_correlate1()" />
+                        <input id="file_name" name="file_name" type="hidden" />
+                        <input type="file" id="upload_file" name="upload_file" style="display: none;" onchange="f_file_correlate2()" accept="image/png, image/jpeg, image/jpg"/>
+                    </div>
+
+                    <button class="MySpace_Button" onclick="f_goToDoctorQualification()" style="position:absolute;top:150px;left:0px;">医生认证</button>
+                </div>
+
+            </div>
+            <div class="BasicInformation" id="basic_information">
+                <div>
+                    <div id="user_id_label" class="MySpace_TextArea_Label" style="position:absolute;top:0px;left:0px;">ID：</div>
+                    <input id="user_id" type="text"  class="MySpace_TextArea" style="position:absolute;top:0px;left:90px;" readonly="readonly">
+                </div>
+                <div>
+                    <div id="user_name_label" class="MySpace_TextArea_Label" style="position:absolute;top:50px;left:0px;">昵称：</div>
+                    <input id="user_name" type="text" class="MySpace_TextArea" style="position:absolute;top:50px;left:90px;">
+                </div>
+                <div>
+                    <div id="user_sex_label" class="MySpace_TextArea_Label" style="position:absolute;top:100px;left:0px;">性别：</div>
+                    <select id="user_sex" class="MySpace_TextArea" style="position:absolute;top:100px;left:90px;">
+                        <option value="0">男</option>
+                        <option value="1">女</option>
+                    </select>
+                </div>
+                <div>
+                    <div id="user_age_label" class="MySpace_TextArea_Label" style="position:absolute;top:150px;left:0px;">年龄：</div>
+                    <input id="user_age" type="text" class="MySpace_TextArea" style="position:absolute;top:150px;left:90px;">
+                </div>
+                <div>
+                    <div id="user_province_label" class="MySpace_TextArea_Label" style="position:absolute;top:200px;left:0px;">省：</div>
+                    <select id="user_province" onclick="f_getCity()" class="MySpace_TextArea" style="position:absolute;top:200px;left:90px;"></select>
+                </div>
+                <div>
+                    <div id="user_city_label" class="MySpace_TextArea_Label" style="position:absolute;top:250px;left:0px;">市：</div>
+                    <select id="user_city" onclick="f_getArea()" class="MySpace_TextArea" style="position:absolute;top:250px;left:90px;"></select>
+                </div>
+                <div>
+                    <div id="user_area_label" class="MySpace_TextArea_Label" style="position:absolute;top:300px;left:0px;">区：</div>
+                    <select id="user_area" class="MySpace_TextArea" style="position:absolute;top:300px;left:90px;"></select>
+                </div>
+
+
+
+                <div id="update_password_part" style="display: none;">
+                    <div id="old_password_label" class="MySpace_TextArea_Label" style="position:absolute;top:350px;left:0px;">原密码：</div>
+                    <input id="old_password" type="text" class="MySpace_TextArea" style="position:absolute;top:350px;left:90px;">
+
+                    <div id="new_password_label" class="MySpace_TextArea_Label" style="position:absolute;top:400px;left:0px;">新密码：</div>
+                    <input id="new_password" type="text" class="MySpace_TextArea" style="position:absolute;top:400px;left:90px;">
+
+                    <div id="confirm_new_password_label" class="MySpace_TextArea_Label" style="position:absolute;top:450px;left:0px;">确认密码：</div>
+                    <input id="confirm_new_password" type="text" class="MySpace_TextArea" style="position:absolute;top:450px;left:90px;">
+                </div>
+            </div>
+        </div>
+
+        <div class="RecordInformationPart" id="record_part" >
+            <div class="RecordPlaceholder_small"></div>
+            <div class="RecordTitle" onclick="f_displayTestingRecord()">自检记录</div>
+            <div class="RecordPlaceholder_small"></div>
+            <div id="record_testing" class="RecordPart" style="display:none;"></div>
+
+            <div class="RecordPlaceholder_small"></div>
+            <div class="RecordTitle" onclick="f_displayThemePostRecord()">主题帖记录</div>
+            <div class="RecordPlaceholder_small"></div>
+            <div id="theme_post_record" class="RecordPart" style="display:none;"></div>
+
+            <div class="RecordPlaceholder_small"></div>
+            <div class="RecordTitle" onclick="f_displaySubPostRecord()">子贴记录</div>
+            <div class="RecordPlaceholder_small"></div>
+            <div id="sub_post_record" class="RecordPart" style="display:none;"></div>
+
+            <div class="RecordPlaceholder_small"></div>
+            <div class="RecordTitle" onclick="f_displayCommentRecord()">评论记录</div>
+            <div class="RecordPlaceholder_small"></div>
+            <div id="comment_record" class="RecordPart" style="display:none;">
+
+                <div class="RecordPlaceholder_small"></div>
+
+
+            </div>
+
+
+
+            <div class="RecordPlaceholder_middle"></div>
+        </div>
+        <div class="RecordPlaceholder_big"></div>
+        <div class="RecordPlaceholder_big"></div>
+    </div>
+
+</body>
+<script>
+    /*user信息*/
+    function f_getUserInformation() {
+        var user_id=window.sessionStorage.getItem("user_id");
+        if(user_id!=null){
+            var data='{"user_id":"'+user_id+'"}'
+            //alert(data)
+            $.ajax({
+                type:"post",
+                dataType:"json",
+                url:"/MySpace/request",
+                data:data,
+                processData :false,
+                contentType:"application/json",
+                async:false,
+                success:function (jsondata) {
+                    //alert(JSON.stringify(jsondata));
+                    document.getElementById("user_id").value=user_id;
+                    document.getElementById("user_name").value=jsondata['user_name'];
+                    document.getElementById("user_sex").value=jsondata['user_sex'];
+                    document.getElementById("user_age").value=jsondata['user_age'];
+
+                    f_getAreaInformation();
+                    document.getElementById("user_province").value=jsondata['user_province'];
+                    f_getCity();
+                    document.getElementById("user_city").value=jsondata['user_city'];
+                    f_getArea();
+                    document.getElementById("user_area").value=jsondata['user_area'];
+
+
+                    if(jsondata['user_type']==0){
+                        document.getElementById("user_type").innerText='用户类型: 普通用户';
+                    }
+                    else if(jsondata['user_type']==1){
+                        document.getElementById("user_type").innerText='用户类型: 医生';
+                    }
+                    else if(jsondata['user_type']==2){
+                        document.getElementById("user_type").innerText='用户类型: 管理员';
+                    }
+
+
+                },
+                error: function (err) {
+                    //alert("Wrong!");
+                }
+            })
+            if(window.sessionStorage["user_image"]!=""){
+                document.getElementById("user_image").src=window.sessionStorage["user_image"];
+                document.getElementById("user_image2").src=window.sessionStorage["user_image"];
+            }
+        }
+
+
+    }
+    function f_updateUserInformation(){
+        var user_id=window.sessionStorage.getItem("user_id");
+        if(user_id!=null){
+            var user_name=document.getElementById("user_name").value;
+            var user_sex=document.getElementById("user_sex").value;
+            var user_age=document.getElementById("user_age").value;
+
+            //地区
+            var user_province=document.getElementById("user_province").value;
+            var user_city=document.getElementById("user_city").value;
+            var user_area=document.getElementById("user_area").value;
+
+
+            var data='{' +
+                '"user_id":"'+user_id+'",' +
+                '"user_name":"' +user_name +'",'+
+                '"user_sex":"' +user_sex +'",'+
+                '"user_age":"' +user_age +'",'+
+                '"user_province":"' +user_province +'",'+
+                '"user_city":"' +user_city +'",'+
+                '"user_area":"' +user_area +'"'+
+                '}'
+            //alert(data)
+            $.ajax({
+                type:"post",
+                dataType:"json",
+                url:"/MySpace/post_updateUserInformation",
+                data:data,
+                processData :false,
+                contentType:"application/json",
+                async:false,
+                success:function (jsondata) {
+                    window.location.href="MySpace";
+                },
+                error: function (err) {
+                    //alert("Wrong!");
+                }
+            })
+            if(titlePictureBase64!=""){
+                f_upload_file();
+            }
+
+            var update_password_part=document.getElementById("update_password_part");
+            if(update_password_part.style.display==""){
+                //alert("!!!!")
+                f_updateUserPassword();
+            }
+        }
+    }
+    function f_updatePassword_visable() {
+        var update_password_part=document.getElementById("update_password_part");
+        if(update_password_part.style.display=="none"){
+            update_password_part.style.display="";
+        }
+        else{
+            update_password_part.style.display="none";
+        }
+
+    }
+    function f_updateUserPassword() {
+        var old_password=document.getElementById("old_password");
+        var new_password=document.getElementById("new_password");
+        var confirm_new_password=document.getElementById("confirm_new_password");
+        if(old_password.value==window.sessionStorage["user_password"]){
+            if(new_password.value==confirm_new_password.value && new_password!=null){
+                var data='{"user_id":"'+window.sessionStorage["user_id"]+'","user_password":"'+new_password.value+'"}'
+                $.ajax({
+                    type:"post",
+                    dataType:"json",
+                    url:"/MySpace/updateUserPassword",
+                    data:data,
+                    processData :false,
+                    contentType:"application/json",
+                    async:false,
+                    success:function (jsondata) {
+
+                    },
+                    error: function (err) {
+                        //alert("Wrong!");
+                    }
+                })
+            }
+        }
+    }
+</script>
+<script>
+    /*头像显示*/
+    function f_file_correlate1(){
+        //javascript:$('input[name=\'upload_file\']').click();
+        var upload_file=document.getElementById("upload_file");
+        upload_file.click();
+    }
+    function f_file_correlate2() {
+        //javascript:$('input[name=\'file_name\']').val(this.files[0].name);
+        var file_name=document.getElementById("file_name");
+        var upload_file=document.getElementById("upload_file");
+        file_name.value=upload_file.files[0].name;
+
+    }
+    var titlePictureBase64="";
+    document.getElementById('upload_file').onchange = function() {
+        var imgFile = this.files[0];
+        var reader = new FileReader();
+        reader.onload = function() {
+            document.getElementById('user_image2').src = reader.result;
+            titlePictureBase64=reader.result
+        };
+        reader.readAsDataURL(imgFile);
+    };
+    function f_upload_file() {
+
+        document.getElementById("user_image").src=titlePictureBase64;
+        document.getElementById("user_image2").src=titlePictureBase64;
+        window.sessionStorage["user_image"]=titlePictureBase64;
+
+        var data='{"file_name":"image/'+ window.sessionStorage.getItem("user_id")+'.txt","data":"'+titlePictureBase64+'"}'
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/uploadFile",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                //alert(jsondata);
+            },
+            error: function (err) {
+                alert("Wrong!");
+            }
+        })
+    }
+</script>
+
+</html>

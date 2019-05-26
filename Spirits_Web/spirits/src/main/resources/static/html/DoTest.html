@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Do Test!</title>
+    <link href="../css/TopPart.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/DoTest.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="../js/jquery.js"></script>
+</head>
+
+<script>
+    function f_jump(index) {
+        var user_id=window.sessionStorage.getItem("user_id");
+        if(user_id!=null){
+            if(index==1){
+                window.location.href="Testing";
+            }
+            else if(index==2){
+                window.location.href="Community";
+            }
+            else if(index==3){
+                window.location.href="MySpace";
+            }
+            else if(index==4){
+                window.location.href="FindDoctor";
+            }
+        }
+        else{
+            window.location.href="SignIn";
+        }
+    }
+    onload =function f_getUserImage() {
+        if(window.sessionStorage["user_image"]!=null){
+            document.getElementById("user_image").src=window.sessionStorage["user_image"];
+        }
+
+        document.getElementById("testing_id").innerText="ID："+window.sessionStorage["testing_id"];
+        document.getElementById("illness_name").innerText="类型："+window.sessionStorage["illness_name"];
+        document.getElementById("illness_type_name").innerText="("+window.sessionStorage["illness_type_name"]+")";
+        document.getElementById("testing_profile").innerText="      "+window.sessionStorage["testing_profile"];
+        document.getElementById("posting_time").innerText="发布时间："+window.sessionStorage["posting_time"];
+        document.getElementById("testing_number").innerText="自检次数："+window.sessionStorage["testing_number"];
+
+        var testing_id=window.sessionStorage["testing_id"];
+        f_getTestingQuestions(testing_id);
+    }
+
+    var question_count=0;
+    function f_getTestingQuestions(testing_id) {
+        var data='{"testing_id":'+testing_id+'}';
+        //alert(data);
+
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Testing/getTestingQuestions",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                //alert(JSON.stringify(jsondata));
+                var result=document.getElementById("result");
+                var testing_questions="";
+                var options="";
+                question_count=jsondata.length;
+                for(var i=0;i<jsondata.length;i++){
+                    options="";
+                    //alert(jsondata[i]["options"].length);
+                    for(var j=0;j<jsondata[i]["options"].length;j++){
+                        //alert(String(jsondata[i]["options_score"][j]));
+                        options=options+
+                            '<div class="Option">'+
+                            '<input type="radio" class="OptionRadio" value="'+jsondata[i]["scores"][j]+'" name="question_'+i+'" />'+
+                            jsondata[i]["options"][j]+
+                            '</div>';
+                    }
+                    testing_questions=testing_questions+
+                        '<div class="QuestionPart">' +
+                        '    <div class="Description">'+jsondata[i]["description"]+'</div>' +
+                             options+
+                        '</div>';
+
+                }
+                //alert(testing_information);
+                result.innerHTML=testing_questions;
+
+            },
+            error: function (err) {
+                alert("Wrong!");
+            }
+        });
+
+    }
+    function f_getTestingResult() {
+        var score=0;
+        for(var i=0;i<question_count;i++){
+            var options=document.getElementsByName("question_"+String(i));
+            var selected_one=-1;
+            for(var j=0;j<options.length;j++){
+                if(options[j].checked){
+                    selected_one=options[j].value;
+                    break;
+                }
+            }
+            if(selected_one==-1){
+                score=-1;
+                alert("注意：未选择第"+String(i+1)+"题！");
+                break;
+            }
+            else{
+                //alert(selected_one);
+                score+=parseInt(selected_one);
+            }
+        }
+
+        if(score!=-1){
+            var testing_id=window.sessionStorage["testing_id"];
+            var data='{"testing_id":"'+testing_id+'","score":"'+score+'","user_id":"'+window.sessionStorage["user_id"]+'"}';
+
+            //alert(data);
+            $.ajax({
+                type:"post",
+                dataType:"json",
+                url:"/Testing/getTestingResult",
+                data:data,
+                processData :false,
+                contentType:"application/json",
+                async:false,
+                success:function (jsondata) {
+                    document.getElementById("diagnosis").innerText="      "+jsondata["diagnosis"];
+                    document.getElementById("diagnosis_part").style.display="";
+                },
+                error: function (err) {
+                    alert("Wrong!");
+                }
+            });
+        }
+    }
+    function f_goBack() {
+        window.location.href="Testing";
+    }
+</script>
+
+<body>
+    <div class="TopPart">
+        <div class="MainLabelPart">
+            <a  href="/" class="MainLabel" >- SPIRITS -</a>
+        </div>
+        <div class="SubTagPart">
+            <a class="SubTag" style="left:0px;color:#9f4248;background-color: rgba(255, 255, 255, 1);"   onclick="f_jump(1)">疾病自检</a>
+            <a class="SubTag" style="left:200px;" onclick="f_jump(2)">互助社区</a>
+            <a class="SubTag" style="left:400px;" onclick="f_jump(3)">个人空间</a>
+            <a class="SubTag" style="left:600px;" onclick="f_jump(4)">联系医生</a>
+        </div>
+        <div class="UserPart">
+            <a href="/SignIn">
+                <img id="user_image" class="UserImage" src="../imgIndex/users.png"  />
+            </a>
+        </div>
+    </div>
+
+
+    <div class="BackGround">
+        <div class="ContentPart">
+            <div id="profilePart" style="position: relative;top: 10px;left: 10px;height:220px;background-color: rgba(0,0,0,0.1);border-radius: 10px;">
+                <div id="testing_id" style="float:left;position: relative;top: 10px;left:10px;font-size: 35px;"></div>
+                <div id="illness_name" style="float:left;position: relative;top: 10px;left:200px;font-size: 35px;"></div>
+                <div id="illness_type_name" style="float:left;position: relative;top: 10px;left:200px;font-size: 35px;"></div>
+                <div id="testing_profile" style="white-space:pre;position: absolute;top: 60px;left:0px;font-size: 30px;"></div>
+                <div id="posting_time" style="position: absolute;top: 180px;left:200px;font-size: 25px;"></div>
+                <div id="testing_number" style="position: absolute;top: 180px;left:750px;font-size: 25px;"></div>
+            </div>
+            <div id="result" style="position: relative;top: 0px;left: 0px"></div>
+            <button class="SubmitButton" onclick="f_getTestingResult()">提交</button>
+
+            <div id="diagnosis_part" style="position: relative;top: 0px;left: 0px;display: none;">
+                <div class="DiagnosisPart_Label">诊断结果：</div>
+                <div id="diagnosis" class="DiagnosisPart" >      结果分析内容</div>
+                <button class="EndTestingButton" onclick="f_goBack()">结束自检</button>
+            </div>
+
+        </div>
+    </div>
+
+
+</body>
+</html>

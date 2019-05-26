@@ -1,0 +1,94 @@
+.BackGround{
+    left:-10px;
+    background-image:url(../pictures/HomePagebackground.jpg);
+    background-size:100% 100%;
+    width:100%;
+    height:1000px;
+    background-attachment: fixed;
+    background-repeat:no-repeat;
+}
+.ContentPart{
+    position: relative;
+    top:100px;
+    margin:0 auto;
+    width: 1200px;
+    height: 800px;
+    background-color: rgba(255,255,255,0.3);
+    overflow: auto;
+    border-radius: 20px;
+}
+
+
+.SelectIllnessType{
+    position:absolute;
+    left:100px;
+    top:30px;
+    width: 300px;
+    height: 35px;
+    font-size: 22px;
+    z-index: 998;
+}
+.SelectButton{
+    position:absolute;
+    left:450px;
+    top:30px;
+    width: 150px;
+    height: 35px;
+    font-size: 22px;
+    border:none;
+    border-radius: 20px;
+    background-color: rgba(23, 48, 255, 0.7);
+    outline:none;
+}
+.SelectButton:hover{
+    background-color: rgba(23, 48, 255,0.9);
+    cursor: pointer;
+}
+
+
+
+
+
+
+.DisplayPart{
+    position:absolute;
+    left:100px;
+    top:30px;
+    width: 300px;
+    height: 35px;
+    font-size: 22px;
+    border-radius: 20px;
+}
+.IllnessPart{
+    position: relative;
+    top: 50px;
+    margin-top: 10px;
+    left:0px;
+    width:1000px;
+    height:220px;
+    background-color: rgba(0,0,0,0.1);
+    border-radius: 20px;
+}
+.IllnessName{
+    float: left;
+    position: relative;
+    top: 5px;
+    left:5px;
+    height:40px;
+    font-size: 40px;
+}
+.IllnessType{
+    position: relative;
+    top: 15px;
+    left:20px;
+    height:25px;
+    font-size: 25px;
+}
+.IllnessProfile{
+    position: absolute;
+    top: 70px;
+    left:10px;
+    width:980px;
+    height:20px;
+    font-size: 20px;
+}

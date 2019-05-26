@@ -1,0 +1,391 @@
+/*背景*/
+.BackGround{
+    left:-10px;
+    background-image:url(../pictures/HomePagebackground.jpg);
+    background-size:100% 100%;
+    width:100%;
+    min-height:1000px;
+    background-attachment: fixed;
+    background-repeat:no-repeat;
+}
+
+/*用户信息*/
+.UserInformationPart{
+    position:absolute;
+    top:100px;
+    left:60px;
+    height: 600px;
+    width:520px;
+    background-color: rgba(255,255,255,0.4);
+    border-radius: 25px;
+}
+.UserInformationImage{
+    height:180px;
+    width:180px;
+    margin-right: 0px;
+    margin-top: 0px;
+    border-radius: 20px;
+    background-color: rgba(0,0,0,0.5);
+}
+.AdvancedInformation{
+    position:absolute;
+    top:20px;
+    left:20px;
+}
+.BasicInformation{
+    position:absolute;
+    top:20px;
+    left:220px;
+}
+
+.MySpace_Button{
+    background-color: rgba(143, 125, 255,0.7);
+    border-radius: 20px;
+    width: 130px;
+    height: 35px;
+    border:none;
+    outline:none;
+    font-size: 20px;
+}
+.MySpace_Button:hover{
+    background-color: rgba(143, 125, 255,0.9);
+    cursor: pointer;
+}
+.MySpace_TextArea{
+    width: 200px;
+    height: 25px;
+    font-size: 20px;
+    border-radius: 5px;
+    border:none;
+    background-color: rgba(255,255,255,0.9);
+    text-indent: 5px;
+}
+.MySpace_TextArea_Label{
+    font-size: 20px;
+    width: 200px;
+    height: 25px;
+}
+
+
+/*占位区*/
+.RecordPlaceholder_small{
+    position: relative;
+    top:0px;
+    left: 0px;
+    min-height: 10px;
+}
+.RecordPlaceholder_middle{
+    position: relative;
+    top:0px;
+    left: 0px;
+    min-height: 40px;
+}
+.RecordPlaceholder_big{
+    position: relative;
+    top:0px;
+    left: 0px;
+    min-height: 100px;
+}
+
+/*记录区*/
+.RecordInformationPart{
+    position:relative;
+    top:90px;
+    left:600px;
+    min-height: 600px;
+    width:850px;
+    background-color: rgba(255,255,255,0.4);
+    border-radius: 25px;
+}
+.RecordTitle{
+    position: relative;
+    top:0px;
+    left: 10px;
+    font-size: 30px;
+    height: 40px;
+    width: 200px;
+    text-align: center;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 20px;
+}
+.RecordTitle:hover{
+    background-color: rgba(0,0,0,0.3);
+    cursor: pointer;
+}
+.RecordPart{
+    position:relative;
+    top:0px;
+    left:10px;
+    min-height: 50px;
+    width:820px;
+    background-color: rgba(0,0,0,0.1);
+    border-radius: 10px;
+
+}
+
+
+.DeleteRecordButton{
+    position:absolute;
+    top:5px;
+    left:700px;
+
+    width: 80px;
+    height: 30px;
+    font-size: 20px;
+    border:none;
+    border-radius: 20px;
+    background-color: rgba(23, 48, 255, 0.7);
+    outline:none;
+    z-index: 500;
+}
+.DeleteRecordButton:hover{
+    background-color: rgba(23, 48, 255,0.9);
+    cursor: pointer;
+}
+
+
+/*自检记录*/
+.Record_Testing{
+    position: relative;
+    top: 0px;
+    left: 10px;
+    min-height: 50px;
+    width: 800px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius:20px;
+    border-left: 5px solid rgba(0,0,255,0.3);
+    background-color: rgba(0,0,0,0.1);
+}
+.TestingID{
+    position:absolute;
+    top:5px;
+    left:10px;
+    font-size: 25px;
+}
+.TestingProfile{
+    position:relative;
+    top:0px;
+    left:10px;
+    min-height: 10px;
+    width: 780px;
+    white-space:pre-wrap;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+.TestingResult{
+    position:relative;
+    top:0px;
+    left:10px;
+    min-height: 10px;
+    width: 780px;
+    white-space:pre-wrap;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+.IllnessType{
+    position:relative;
+    top:0px;
+    left:500px;
+    font-size: 15px;
+}
+
+
+/*主题帖记录*/
+.Record_ThemePost{
+    position: relative;
+    top: 0px;
+    left: 10px;
+    min-height: 50px;
+    width: 800px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius:20px;
+    border-left: 5px solid rgba(0,0,255,0.3);
+    background-color: rgba(0,0,0,0.1);
+}
+.ThemePostUpdateButton{
+    position:absolute;
+    top:5px;
+    left:600px;
+    width: 80px;
+    height: 30px;
+    font-size: 20px;
+    border:none;
+    border-radius: 20px;
+    background-color: rgba(23, 48, 255, 0.7);
+    outline:none;
+    z-index: 500;
+}
+.ThemePostUpdateButton:hover{
+    background-color: rgba(23, 48, 255,0.9);
+    cursor: pointer;
+}
+.ThemePostIllnessName{
+    position:absolute;
+    left:10px;
+    top:5px;
+    width: 250px;
+    height: 35px;
+    font-size: 22px;
+    background-color: rgba(255,255,255,0.7);
+    border:none;
+    outline:none;
+    border-radius: 5px;
+    z-index: 400;
+}
+.ThemePostIllnessTypeName{
+    position:absolute;
+    left:280px;
+    top:5px;
+    width: 250px;
+    height: 35px;
+    font-size: 22px;
+    background-color: rgba(255,255,255,0.7);
+    border:none;
+    outline:none;
+    border-radius: 5px;
+    z-index: 400;
+}
+.ThemePostTitle{
+    position:relative;
+    left:10px;
+    top:0px;
+    width: 780px;
+    min-height: 30px;
+    font-size: 22px;
+    background-color: rgba(255,255,255,0.7);
+    border:none;
+    outline:none;
+    resize:none;
+}
+.ThemePostProfile{
+    position:relative;
+    left:10px;
+    top:0px;
+    width: 780px;
+    min-height: 120px;
+    font-size: 22px;
+    background-color: rgba(255,255,255,0.7);
+    border:none;
+    outline:none;
+    resize:none;
+    border-radius: 5px;
+}
+.ThemePostPostingTime{
+    position:relative;
+    left:450px;
+    top:0px;
+    width: 780px;
+    min-height: 20px;
+    font-size: 15px;
+}
+
+
+
+/*子贴记录*/
+.Record_SubPost{
+    position: relative;
+    top: 0px;
+    left: 10px;
+    min-height: 50px;
+    width: 800px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius:20px;
+    border-left: 5px solid rgba(0,0,255,0.3);
+    background-color: rgba(0,0,0,0.1);
+}
+
+.SubPostIllness{
+    position:absolute;
+    left:10px;
+    top:10px;
+}
+.SubPostPostingTime{
+    position:absolute;
+    left:350px;
+    top:10px;
+}
+.SubPostThemePostTitle{
+    position:relative;
+    left:10px;
+    top:0px;
+    min-height: 0px;
+    width: 780px;
+    white-space:pre-wrap;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+.SubPostContent{
+    position:relative;
+    left:10px;
+    top:0px;
+    min-height: 0px;
+    width: 780px;
+    white-space:pre-wrap;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+
+
+
+/*评论记录*/
+
+.Record_Comment{
+    position: relative;
+    top: 0px;
+    left: 10px;
+    min-height: 50px;
+    width: 800px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius:20px;
+    border-left: 5px solid rgba(0,0,255,0.3);
+    background-color: rgba(0,0,0,0.1);
+}
+.CommentIllness{
+    position:absolute;
+    left:10px;
+    top:10px;
+}
+.CommentPostingTime{
+    position:absolute;
+    left:350px;
+    top:10px;
+}
+.CommentThemePostTitle{
+    position:relative;
+    left:10px;
+    top:0px;
+    min-height: 0px;
+    width: 780px;
+    white-space:pre-wrap;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+.CommentContent{
+    position:relative;
+    left:10px;
+    top:0px;
+    min-height: 0px;
+    width: 780px;
+    white-space:pre-wrap;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,58 @@
+.TopPart{
+    height: 60px;
+    width: 100%;
+    background-color:rgba(159,66,72,0.9);
+    position: fixed;
+    top:0px;
+    left: 0px;
+    z-index:999;
+}
+.SubTagPart  {
+    position: absolute;
+    top: 0px;
+    left:400px;
+}
+.SubTag{
+    position:absolute;
+    top:10px;
+    width: 200px;
+    height: 45px;
+    font-size: 25px;
+    display: block;
+    text-align: center;
+    margin-top: 5px;
+    color: #ffffff;
+    font-weight: bold;
+}
+.SubTag:hover{
+    color:#9f4248;
+    background-color: rgba(255, 255, 255, 1);
+    cursor: pointer;
+}
+.UserPart{
+    position: absolute;
+    top: 10px;
+    left: 1400px;
+}
+.UserImage{
+    height:40px;
+    margin-right: 0px;
+    margin-top: 0px;
+    width:40px;
+    border-radius: 20px;
+}
+
+.MainLabelPart{
+    position: absolute;
+    height: 60px;
+    left:20px;
+    top:0px;
+}
+.MainLabel{
+    font-size: 60px;
+    font-family: Broadway;
+    text-decoration: none;
+    color: #fff7fb;
+}
+
+

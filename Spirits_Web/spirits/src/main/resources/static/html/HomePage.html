@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Welcome to Spirits</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <link href="../css/TopPart.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/HomePage.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/BottomPart.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<style type="text/css">
+
+</style>
+<script>
+    function f_jump(index) {
+        var user_id=window.sessionStorage.getItem("user_id");
+        if(user_id!=null){
+            if(index==1){
+                window.location.href="Testing";
+            }
+            else if(index==2){
+                window.location.href="Community";
+            }
+            else if(index==3){
+                window.location.href="MySpace";
+            }
+            else if(index==4){
+                window.location.href="FindDoctor";
+            }
+        }
+        else{
+            window.location.href="SignIn";
+        }
+    }
+</script>
+<body>
+    <div class="TopPart">
+        <div class="MainLabelPart">
+            <a  href="/" class="MainLabel" > >SPIRITS <  </a>
+        </div>
+        <div class="SubTagPart">
+            <a class="SubTag" style="left:0px;"   onclick="f_jump(1)">疾病自检</a>
+            <a class="SubTag" style="left:200px;" onclick="f_jump(2)">互助社区</a>
+            <a class="SubTag" style="left:400px;" onclick="f_jump(3)">个人空间</a>
+            <a class="SubTag" style="left:600px;" onclick="f_jump(4)">联系医生</a>
+        </div>
+        <div class="UserPart">
+            <a href="/SignIn">
+                <img id="user_image" class="UserImage" src="../imgIndex/users.png"  />
+            </a>
+        </div>
+    </div>
+    <div class="BackGround">
+        <div class="ContentPart">
+            <select id="type" class="SelectIllnessType">
+                <option value="0">全部疾病</option>
+                <option value="1">成年人常见疾病</option>
+                <option value="2">儿童常见疾病</option>
+                <option value="3">青少年常见疾病</option>
+                <option value="4">生理心理疾病</option>
+            </select>
+            <button class="SelectButton" onclick="f_getIllnessInformation()">查看</button>
+            <div id="result" class="DisplayPart"></div>
+        </div>
+    </div>
+    <div class="BottomPart">
+        <div style="position: relative;top:10px;">
+            祝你&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            早日&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            康复&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            药到&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            病除&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            关注我们
+        </div>
+        <div style="position: relative;top:10px;">
+            @最终解释权归SPIRITS有限公司所有
+        </div>
+    </div>
+</body>
+<script>
+    onload =function f_getUserImage() {
+        if(window.sessionStorage["user_image"]!=""  &&window.sessionStorage["user_image"]!=null){
+            document.getElementById("user_image").src=window.sessionStorage["user_image"];
+        }
+    }
+    function f_getIllnessInformation() {
+        var type=document.getElementById("type")
+        var data='{"illness_type":'+type.value+'}'
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/getIllnessInformation",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                //alert(JSON.stringify(jsondata));
+                var result=document.getElementById("result");
+                var illness="";
+                for(var i=0;i<jsondata["number"];i++){
+                    illness=illness+
+                        "<div class='IllnessPart'style=''>" +
+                        "    <div class='IllnessName'>"+ jsondata["name_"+parseInt(i)] +"</div>" +
+                        "    <div class='IllnessType'>("+ jsondata["type_"+parseInt(i)] +")</div>" +
+                        "    <div class='IllnessProfile'>&nbsp;&nbsp;&nbsp;&nbsp;"+ jsondata["profile_"+parseInt(i)] +"</div>" +
+                        "</div>"
+                }
+                result.innerHTML=illness;
+            },
+            error: function (err) {
+                alert("Wrong!");
+            }
+        })
+    }
+</script>
+</html>
+
+
+

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录页面</title>
+    <link rel="stylesheet" type="text/css" href="../css/SignIn.css">
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <style type="text/css">a {text-decoration: none;color:white;}</style>
+</head>
+<script>
+    function f_SignIn() {
+        var id=document.getElementById("id");
+        var password=document.getElementById("password");
+
+        if(id.value!='' && password.value!=''){
+            var id=document.getElementById("id");
+            var password=document.getElementById("password")
+            var data='{"id":"'+id.value+'","password":"'+password.value+'"}'
+
+            $.ajax({
+                type:"post",
+                dataType:"json",
+                url:"/SignIn/request",
+                data:data,
+                processData :false,
+                contentType:"application/json",
+                async:false,
+                success:function (jsondata) {
+                    if(jsondata["user_name"]!=null){
+                        window.sessionStorage["user_id"]=jsondata['user_id']
+                        window.sessionStorage["user_name"]=jsondata['user_name']
+                        window.sessionStorage["user_password"]=jsondata['user_password']
+                        window.sessionStorage["user_level"]=jsondata['user_level']
+
+                        f_getPicture();
+                        window.location.href="HomePage";
+                    }
+                },
+                error: function (err) {
+                    alert("登录失败!请检查账户密码是否错误！");
+                }
+            })
+            //id.style.color="#000000";
+            //password.style.color="#000000";
+
+        }
+        else{
+            if(id.value==''){
+                id.placeholder='请输入用户ID';
+                //id.style.color="#ff0000";
+            }
+            if(password.value==''){
+                password.placeholder='请输入密码';
+                //password.style.color="#ff0000";
+            }
+        }
+    }
+    function f_getPicture() {
+        var image_name='image/'+window.sessionStorage["user_id"]+'.txt';
+        //alert(image_name);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/downloadFile",
+            data:image_name,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                window.sessionStorage["user_image"]=jsondata['data'];
+                //alert(window.sessionStorage["user_image"]);
+            },
+            error: function (err) {
+                //alert(err);
+            }
+        })
+    }
+    function f_SignUp() {
+        window.location.href="SignUp";
+    }
+</script>
+<body>
+<div class="wrapper">
+    <article>
+        <h1><span>欢迎来到SPIRITS</span></h1>
+        <div class="main">
+            <div class="form">
+                <div class="userName">
+                    <input type="text" id="id" placeholder="用户ID">
+                </div>
+                <div class="password">
+                    <input type="password" id="password" placeholder="密码">
+                </div>
+                <button onclick="f_SignIn()">登录</button>
+                <button class="toRegist" style="background-color: #7c99ff;border-radius:5px;" onclick="f_SignUp()"><a class="lable" >注册</a></button>
+                <button class="Back" style="background-color: #7c99ff;border-radius:5px;"><a class="lable" href="/">返回首页</a></button>
+            </div>
+        </div>
+    </article>
+    <footer>
+        <ul>
+            <li>祝你</li>
+            <li>早日</li>
+            <li>康复</li>
+            <li>药到</li>
+            <li>病除</li>
+            <li>关注我们</li>
+        </ul>
+        <p>@最终解释权归SPIRITS有限公司所有/p>
+    </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Testing</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <link href="../css/TopPart.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/Testing.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<script>
+    function f_jump(index) {
+        var user_id=window.sessionStorage.getItem("user_id");
+        if(user_id!=null){
+            if(index==1){
+                window.location.href="Testing";
+            }
+            else if(index==2){
+                window.location.href="Community";
+            }
+            else if(index==3){
+                window.location.href="MySpace";
+            }
+            else if(index==4){
+                window.location.href="FindDoctor";
+            }
+        }
+        else{
+            window.location.href="SignIn";
+        }
+    }
+    onload =function f_page() {
+        if(window.sessionStorage["user_image"]!="" && window.sessionStorage["user_image"]!=null){
+            document.getElementById("user_image").src=window.sessionStorage["user_image"];
+        }
+        f_getMaxPageIndex();
+    }
+
+    //分页查询
+    var page_index=1;
+    var max_page_index;
+    function f_previous() {
+        if(page_index-1>=1){
+            page_index-=1;
+            f_getTestingInformation(page_index);
+        }
+    }
+    function f_next() {
+        if(page_index+1<=max_page_index){
+            page_index+=1;
+            f_getTestingInformation(page_index);
+        }
+    }
+    
+    //得到题目信息
+    function f_getMaxPageIndex() {
+        var illness_type=document.getElementById("illness_type");
+        var data='{"illness_type":'+illness_type.value+'}';
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Testing/getMaxPageIndex",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                max_page_index=jsondata;
+                //alert(max_page_index);
+            },
+            error: function (err) {
+                alert("Wrong!");
+            }
+        });
+        page_index=1;
+        f_getTestingInformation(page_index);
+    }
+    function f_getTestingInformation(current_index){
+        var illness_type=document.getElementById("illness_type");
+        var data='{"illness_type":'+illness_type.value+',"page_index":'+ current_index+'}';
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Testing/getTestingInformation",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                var result=document.getElementById("result");
+                var testing_information="";
+                for(var i=0;i<jsondata.length;i++){
+                    testing_information=testing_information+
+                        '<div class="TestingPart" ' +
+                        'onclick="f_getTestingQuestions('+jsondata[i]["testing_id"]+',\''+jsondata[i]["illness_name"]+'\',\''+
+                        jsondata[i]["illness_type_name"]+'\',\''+jsondata[i]["testing_profile"]+'\',\''+jsondata[i]["posting_time"]+'\','+
+                        jsondata[i]["testing_number"]+')">' +
+                        '    <div class="TestingID">ID：'+jsondata[i]["testing_id"]+'</div>' +
+                        '    <div class="IllnessName">类型：'+jsondata[i]["illness_name"]+'</div>' +
+                        '    <div class="IllnessType">('+jsondata[i]["illness_type_name"]+')</div>' +
+                        '    <div class="TestingProfile">&nbsp;&nbsp;&nbsp;&nbsp;'+jsondata[i]["testing_profile"]+'</div>' +
+                        '    <div class="PostingTime">发布日期：'+jsondata[i]["posting_time"]+'</div>' +
+                        '    <div class="TestingNumber">自检次数：'+jsondata[i]["testing_number"]+'</div>' +
+                        '</div>'
+                }
+                //alert(testing_information);
+                result.innerHTML=testing_information;
+
+            },
+            error: function (err) {
+                alert("Wrong!");
+            }
+        });
+        var current=document.getElementById("current");
+        current.innerText=String(current_index)+'/'+String(max_page_index)+'页';
+
+    }
+
+    //进入具体题目页面
+    function f_getTestingQuestions(testing_id,illness_name,illness_type_name,testing_profile,posting_time,testing_number) {
+        window.sessionStorage["testing_id"]=testing_id;
+        window.sessionStorage["illness_name"]=illness_name;
+        window.sessionStorage["illness_type_name"]=illness_type_name;
+        window.sessionStorage["testing_profile"]=testing_profile;
+        window.sessionStorage["posting_time"]=posting_time;
+        window.sessionStorage["testing_number"]=testing_number;
+        window.location.href="DoTest";
+    }
+</script>
+<body>
+    <div class="TopPart">
+        <div class="MainLabelPart">
+            <a  href="/" class="MainLabel" >- SPIRITS -</a>
+        </div>
+        <div class="SubTagPart">
+            <a class="SubTag" style="left:0px;color:#9f4248;background-color: rgba(255, 255, 255, 1);"   onclick="f_jump(1)">疾病自检</a>
+            <a class="SubTag" style="left:200px;" onclick="f_jump(2)">互助社区</a>
+            <a class="SubTag" style="left:400px;" onclick="f_jump(3)">个人空间</a>
+            <a class="SubTag" style="left:600px;" onclick="f_jump(4)">联系医生</a>
+        </div>
+        <div class="UserPart">
+            <a href="/SignIn">
+                <img id="user_image" class="UserImage" src="../imgIndex/users.png"  />
+            </a>
+        </div>
+    </div>
+
+    <div class="BackGround">
+        <div class="ContentPart">
+            <select id="illness_type" class="SelectIllnessType">
+                <option value="0">全部疾病</option>
+                <option value="1">成年人常见疾病</option>
+                <option value="2">儿童常见疾病</option>
+                <option value="3">青少年常见疾病</option>
+                <option value="4">生理心理疾病</option>
+            </select>
+            <button class="SelectButton" onclick="f_getMaxPageIndex()">搜索题目</button>
+
+            <div id="result" class="DisplayPart" ></div>
+            <div id="index_part" class="IndexPart">
+                <div id="previous" style="position: absolute;left: 300px;top: 0px;">
+                    <button class="IndexButton" onclick="f_previous()">上一页</button>
+                </div>
+                <div id="current" class="IndexLabel" style="position: absolute;left: 450px;top: 0px;"></div>
+                <div id="next" style="position: absolute;left: 580px;top: 0px;">
+                    <button class="IndexButton" onclick="f_next()">下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

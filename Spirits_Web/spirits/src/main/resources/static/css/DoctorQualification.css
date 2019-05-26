@@ -1,0 +1,98 @@
+/*背景*/
+.BackGround{
+    left:-10px;
+    background-image:url(../pictures/HomePagebackground.jpg);
+    background-size:100% 100%;
+    width:100%;
+    min-height:1000px;
+    background-attachment: fixed;
+    background-repeat:no-repeat;
+}
+.ContentPart{
+    position: relative;
+    top:0px;
+    margin:0 auto;
+    width: 1200px;
+    min-height: 600px;
+    background-color: rgba(255,255,255,0.3);
+    overflow: auto;
+    border-radius: 20px;
+}
+
+.PlaceHolder{
+    position: relative;
+    top:0px;
+    left:0px;
+    min-height: 100px;
+}
+
+
+
+.Title{
+    position: relative;
+    height: 50px;
+    width: 1200px;
+    font-size: 35px;
+    text-align: center;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+
+    background-color: rgba(0,0,255,0.5);
+}
+/**/
+.DoctorQualification_Label{
+    position: absolute;
+    font-size: 25px;
+    width: 150px;
+    height: 35px;
+}
+.DoctorQualification_TextArea{
+    position: absolute;
+    width: 400px;
+    height: 35px;
+    font-size: 25px;
+    border-radius: 5px;
+    border:none;
+    background-color: rgba(255,255,255,0.7);
+    text-indent: 5px;
+}
+
+
+
+.ImagePart{
+    position: absolute;
+    top: 80px;
+    left: 700px;
+    width: 300px;
+    height: 400px;
+    border-radius: 5px;
+    background-color: rgba(0,0,0,0.3);
+    text-align: center;
+    display: table-cell;
+    vertical-align:middle;
+}
+.QualificationImage{
+    max-width: 300px;
+    max-height: 400px;
+}
+
+.QualificationButton{
+    position: absolute;
+    background-color: rgba(143, 125, 255,0.7);
+    border-radius: 20px;
+    width: 170px;
+    height: 45px;
+    border:none;
+    outline:none;
+    font-size: 30px;
+}
+.QualificationButton:hover{
+    background-color: rgba(143, 125, 255,0.9);
+    cursor: pointer;
+}
+
+
+
+
+
+

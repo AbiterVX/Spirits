@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Find Doctor</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <link href="../css/TopPart.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/FindDoctor.css" rel="stylesheet" type="text/css"/>
+</head>
+<script>
+    function f_jump(index) {
+        var user_id=window.sessionStorage.getItem("user_id");
+        if(user_id!=null){
+            if(index==1){
+                window.location.href="Testing";
+            }
+            else if(index==2){
+                window.location.href="Community";
+            }
+            else if(index==3){
+                window.location.href="MySpace";
+            }
+            else if(index==4){
+                window.location.href="FindDoctor";
+            }
+        }
+        else{
+            window.location.href="SignIn";
+        }
+    }
+    onload =function f_getUserImage() {
+        if(window.sessionStorage["user_image"]!=null){
+            document.getElementById("user_image").src=window.sessionStorage["user_image"];
+        }
+        f_getAreaInformation();
+    }
+
+    //地区
+    var area_data;
+    function f_getAreaInformation() {
+        var data='{"area":""}';
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/FindDoctor/getAreaInformation",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                //alert(JSON.stringify(jsondata));
+                area_data=jsondata;
+                var current_province=document.getElementById("current_province");
+                var options='<option value="-1">全国</option>';
+                for(var i=0;i<jsondata.length;i++){
+                    //alert(jsondata[i]["name"]);
+                    options=options+
+                        '<option value="'+i+'">'+ jsondata[i]["name"]+'</option>';
+                }
+                current_province.innerHTML=options;
+                f_getCity();
+            },
+            error: function (err) {
+                //alert("Wrong!");
+            }
+        })
+    }
+    function f_getCity() {
+        var current_province_index=document.getElementById("current_province").value;
+        var current_city=document.getElementById("current_city");
+        var options='<option value="-1">所有市</option>';
+        if(current_province_index!=-1){
+            for(var i=0;i<area_data[current_province_index]["city"].length;i++){
+                //alert(JSON.stringify(area_data[current_province_index]["city"]));
+                options=options+
+                    '<option value="'+i+'">'+ area_data[current_province_index]["city"][i]["name"]+'</option>';
+            }
+        }
+        current_city.innerHTML=options;
+        f_getArea();
+    }
+    function f_getArea() {
+        var current_province_index=document.getElementById("current_province").value;
+        var current_city_index=document.getElementById("current_city").value;
+        var current_area=document.getElementById("current_area");
+        var options='<option value="-1">所有区</option>';
+        if(current_city_index!=-1){
+            for(var i=0;i<area_data[current_province_index]["city"][current_city_index]["area"].length;i++){
+                //alert(JSON.stringify(area_data[current_province_index]["city"]));
+                options=options+
+                    '<option value="'+i+'">'+ area_data[current_province_index]["city"][current_city_index]["area"][i]+'</option>';
+            }
+        }
+        current_area.innerHTML=options;
+    }
+
+    //医生信息
+    function f_findDoctorInformation() {
+        var province=document.getElementById("current_province").value;
+        var city=document.getElementById("current_city").value;
+        var area=document.getElementById("current_area").value;
+        var data='{"province":"'+province+'","city":"'+city+'","area":"'+area+'"}';
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/FindDoctor/getDoctorInformation",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                //alert(JSON.stringify(jsondata));
+                var DoctorPart=document.getElementById("DoctorPart");
+                var records="<div class=\"PlaceHolder_small\"></div>\n";
+                for(var i=0;i<jsondata.length;i++){
+                    var image=f_getDoctorQualificationImage(jsondata[i]["user_id"]);
+                    records=records+
+                        '<div class="DoctorInformation">\n' +
+                        '     <div class="DoctorRealName_Label">真实姓名：</div>\n' +
+                        '     <div class="DoctorRealName">'+jsondata[i]["real_name"]+'</div>\n' +
+                        '     <div class="DoctorPosition_Label">职位：</div>\n' +
+                        '     <div class="DoctorPosition">'+jsondata[i]["position"]+'</div>\n' +
+                        '     <div class="DoctorTelephone_Label">联系方式：</div>\n' +
+                        '     <div class="DoctorTelephone">'+jsondata[i]["telephone"]+'</div>\n' +
+                        '     <div class="DoctorDepartment_Label">所在单位：</div>\n' +
+                        '     <div class="DoctorDepartment">'+jsondata[i]["department"]+'</div>\n' +
+                        '     <div class="DoctorProvince_Label">省：</div>\n' +
+                        '     <div class="DoctorProvince">'+jsondata[i]["province"]+'</div>\n' +
+                        '     <div class="DoctorCity_Label">市：</div>\n' +
+                        '     <div class="DoctorCity">'+jsondata[i]["city"]+'</div>\n' +
+                        '     <div class="DoctorArea_Label">区：</div>\n' +
+                        '     <div class="DoctorArea">'+jsondata[i]["area"]+'</div>\n' +
+                        '     <div class="DoctorQualification">\n' +
+                        '          <img class="QualificationImage" src="'+image+'"/>\n' +
+                        '     </div>\n' +
+                        '</div>\n' +
+                        '<div class="PlaceHolder_small"></div>\n'
+                }
+                DoctorPart.innerHTML=records;
+            },
+            error: function (err) {
+                //alert("Wrong!");
+            }
+        })
+    }
+    function f_getDoctorQualificationImage(user_id) {
+
+        var data='{"file_name":"'+user_id+'.txt"}';
+        var result="";
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/FindDoctor/getDoctorQualificationImage",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                //alert(JSON.stringify(jsondata["data"]));
+                result=jsondata["data"];
+                if(result=="" || result==null){
+                    result="../imgIndex/users.png";
+                }
+                return result;
+            },
+            error: function (err) {
+                //alert("Wrong!");
+            }
+        })
+        return result;
+    }
+</script>
+<body>
+    <div class="TopPart">
+        <div class="MainLabelPart">
+            <a  href="/" class="MainLabel" >- SPIRITS -</a>
+        </div>
+        <div class="SubTagPart">
+            <a class="SubTag" style="left:0px;"   onclick="f_jump(1)">疾病自检</a>
+            <a class="SubTag" style="left:200px;" onclick="f_jump(2)">互助社区</a>
+            <a class="SubTag" style="left:400px;" onclick="f_jump(3)">个人空间</a>
+            <a class="SubTag" style="left:600px;color:#9f4248;background-color: rgba(255, 255, 255, 1);" onclick="f_jump(4)">联系医生</a>
+        </div>
+        <div class="UserPart">
+            <a href="/SignIn">
+                <img id="user_image" class="UserImage" src="../imgIndex/users.png"  />
+            </a>
+        </div>
+    </div>
+
+    <div class="BackGround">
+        <div class="PlaceHolder"></div>
+        <div class="ContentPart">
+            <div class="SelectPart">
+                <select id="current_province" class="SelectProvince" onclick="f_getCity()"></select>
+                <select id="current_city" class="SelectCity" onclick="f_getArea()"></select>
+                <select id="current_area" class="SelectArea"></select>
+                <button class="SearchButton" onclick="f_findDoctorInformation()">查询</button>
+            </div>
+
+            <div id="DoctorPart" class="DoctorPart"></div>
+            <div class="PlaceHolder"></div>
+        </div>
+        <div class="PlaceHolder"></div>
+    </div>
+
+</body>
+<script>
+
+</script>
+</html>

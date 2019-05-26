@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DoctorQualification</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <link href="../css/DoctorQualification.css" rel="stylesheet" type="text/css"/>
+</head>
+<script>
+    function f_goToMySpace() {
+        window.location.href="MySpace";
+    }
+    var exist_data=0;
+    function f_uploadDoctorQualification() {
+        var real_name=document.getElementById("real_name").value;
+        var position=document.getElementById("position").value;
+        var telephone=document.getElementById("telephone").value;
+        var department=document.getElementById("department").value;
+        var data='{"user_id":"'+window.sessionStorage.getItem("user_id")+'",' +
+            '"real_name":"'+real_name+'",' +
+            '"position":"'+position+'",' +
+            '"telephone":"'+telephone+'",' +
+            '"department":"'+department+'"}';
+        //alert(data);
+
+
+        if(exist_data==0){
+            $.ajax({
+                type:"post",
+                dataType:"json",
+                url:"/FindDoctor/insertDoctorQualification",
+                data:data,
+                processData :false,
+                contentType:"application/json",
+                async:false,
+                success:function (jsondata) {
+                },
+                error: function (err) {
+                }
+            })
+        }
+        else if(exist_data==1){
+            $.ajax({
+                type:"post",
+                dataType:"json",
+                url:"/FindDoctor/updateDoctorQualification",
+                data:data,
+                processData :false,
+                contentType:"application/json",
+                async:false,
+                success:function (jsondata) {
+                },
+                error: function (err) {
+                }
+            })
+        }
+
+        if(titlePictureBase64!=""){
+            f_submitDoctorQualification();
+        }
+        window.location.href="DoctorQualification";
+    }
+
+
+    function f_getDoctorQualificationImage(user_id) {
+        var data='{"file_name":"'+user_id+'.txt"}';
+        var result="";
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/FindDoctor/getDoctorQualificationImage",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                //alert(JSON.stringify(jsondata["data"]));
+                result=jsondata["data"];
+                if(result=="" || result==null){
+                    result="../imgIndex/users.png";
+                }
+                return result;
+            },
+            error: function (err) {
+
+                //alert("Wrong!");
+            }
+        })
+        return result;
+    }
+    onload=function f_getDoctorQualificationInformation() {
+        var data='{"user_id":"'+window.sessionStorage.getItem("user_id")+'"}';
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/FindDoctor/getUserDoctorInformation",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                var real_name=document.getElementById("real_name");
+                var position=document.getElementById("position");
+                var telephone=document.getElementById("telephone");
+                var department=document.getElementById("department");
+                var state=document.getElementById("state");
+                real_name.value=jsondata["real_name"];
+                position.value=jsondata["position"];
+                telephone.value=jsondata["telephone"];
+                department.value=jsondata["department"];
+                if(jsondata["qualification_state"]==0){
+                    state.innerText="认证状态：待认证";
+                }
+                else if(jsondata["qualification_state"]==1){
+                    state.innerText="认证状态：认证通过";
+                }
+
+                var image=f_getDoctorQualificationImage(window.sessionStorage.getItem("user_id"));
+                document.getElementById("user_image").src=image;
+
+                exist_data=1;
+                //alert(jsondata["qualification_state"]);
+            },
+            error: function (err) {
+                exist_data=0;
+                //alert("Wrong!");
+            }
+        })
+    }
+</script>
+<body>
+    <div class="BackGround">
+        <div class="PlaceHolder"></div>
+        <div class="ContentPart">
+            <div class="Title">医生认证</div>
+            <div class="DoctorQualification_Label" style="left: 100px;top: 80px;">真实姓名：</div>
+            <input id="real_name" type="text" class="DoctorQualification_TextArea" style="left: 250px;top: 80px;">
+
+            <div class="DoctorQualification_Label" style="left: 100px;top: 140px;">职位：</div>
+            <input id="position" type="text" class="DoctorQualification_TextArea" style="left: 250px;top: 140px;">
+
+            <div class="DoctorQualification_Label" style="left: 100px;top: 200px;">联系方式：</div>
+            <input id="telephone" type="text" class="DoctorQualification_TextArea" style="left: 250px;top: 200px;">
+
+            <div class="DoctorQualification_Label" style="left: 100px;top: 260px;">工作单位：</div>
+            <input id="department" type="text" class="DoctorQualification_TextArea" style="left: 250px;top: 260px;">
+
+            <div id="state" class="DoctorQualification_Label" style="left: 100px;top: 320px;width: 300px;"></div>
+
+            <div class="ImagePart">
+                <img id="user_image" class="QualificationImage" src="../imgIndex/users.png"/>
+            </div>
+
+
+            <button class="QualificationButton" onclick="f_uploadDoctorQualification()"  style="left: 300px;top: 500px">提交信息</button>
+            <button class="QualificationButton" style="left: 700px;top: 500px" onclick="f_goToMySpace()">返回空间</button>
+
+            <div style="position:absolute;left: 500px;top: 500px">
+                <input type="button" value="选择图片" class="QualificationButton" onclick="f_file_correlate1()" />
+                <input id="file_name" type="hidden"/>
+                <input id="upload_file" type="file" style="display: none;" onchange="f_file_correlate2()" accept="image/png, image/jpeg, image/jpg"/>
+            </div>
+        </div>
+        <div class="PlaceHolder"></div>
+    </div>
+
+</body>
+
+<script>
+    /*图片显示*/
+    function f_file_correlate1(){
+        var upload_file=document.getElementById("upload_file");
+        upload_file.click();
+    }
+    function f_file_correlate2() {
+        var file_name=document.getElementById("file_name");
+        var upload_file=document.getElementById("upload_file");
+        file_name.value=upload_file.files[0].name;
+    }
+    var titlePictureBase64="";
+    document.getElementById('upload_file').onchange = function() {
+        var imgFile = this.files[0];
+        var reader = new FileReader();
+        reader.onload = function() {
+            document.getElementById('user_image').src = reader.result;
+            titlePictureBase64=reader.result
+        };
+        reader.readAsDataURL(imgFile);
+    };
+    function f_submitDoctorQualification() {
+        document.getElementById("user_image").src=titlePictureBase64;
+        var data='{"file_name":"doctor_qualification/'+ window.sessionStorage.getItem("user_id")+'.txt","data":"'+titlePictureBase64+'"}'
+        //alert(data);
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/uploadFile",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                //alert(jsondata);
+            },
+            error: function (err) {
+                //alert("Wrong!");
+            }
+        })
+    }
+</script>
+
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

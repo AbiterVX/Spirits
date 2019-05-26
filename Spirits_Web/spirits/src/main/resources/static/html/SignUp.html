@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册页面</title>
+    <link rel="stylesheet" type="text/css" href="../css/SignUp.css">
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <style type="text/css">a {text-decoration: none;color:white;}</style>
+</head>
+
+<script>
+    function f_SignUp() {
+        var user_name=document.getElementById("user_name");
+        var password=document.getElementById("password");
+        var confirm_password=document.getElementById("confirm_password");
+        if(user_name.value!=''){
+            if(password.value!='' && password.value==confirm_password.value){
+                var data='{"user_name":"'+user_name.value+'","password":"'+password.value+'"}'
+                $.ajax({
+                    type:"post",
+                    dataType:"json",
+                    url:"/SignUp/request",
+                    data:data,
+                    processData :false,
+                    contentType:"application/json",
+                    async:false,
+                    success:function (jsondata) {
+                        if(jsondata["user_id"]!=null){
+                            window.sessionStorage["user_id"]=jsondata['user_id'];
+                            window.sessionStorage["user_name"]=user_name.value;
+                            window.sessionStorage["user_password"]=password.value;
+                            window.sessionStorage["user_level"]=0;
+                            window.sessionStorage["user_image"]="";
+                            //alert(window.sessionStorage.getItem("user_id"));
+                            window.location.href="MySpace";
+                        }
+                    },
+                    error: function (err) {
+                        alert("注册失败!");
+                    }
+                })
+            }
+            else {
+                alert("两次密码输入不一致");
+            }
+        }
+        else {
+            alert("请输入用户名!");
+        }
+    }
+</script>
+<body>
+    <div class="wrapper">
+        <article>
+            <h1><span>加入SPIRITS！</span></h1>
+            <div class="main">
+                <div class="form">
+                    <div class="userName">
+                        <input type="text" id="user_name" name="user_name" placeholder="用户名">
+                    </div>
+                    <div class="password">
+                        <input type="password" id="password" name="password" placeholder="密码">
+                    </div>
+                    <div class="againpwd">
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="再次输入密码">
+                    </div>
+                    <button onclick="f_SignUp()">注册</button>
+                    <button class="Back" style="background-color: #ffc2ba"><a class="lable" href="/">返回首页</a></button>
+                </div>
+            </div>
+        </article>
+        <footer>
+            <ul>
+                <li>祝你</li>
+                <li>早日</li>
+                <li>康复</li>
+                <li>药到</li>
+                <li>病除</li>
+                <li>关注我们</li>
+            </ul>
+            <p>@最终解释权归SPIRITS有限公司所有/p>
+        </footer>
+    </div>
+</body>
+</html>

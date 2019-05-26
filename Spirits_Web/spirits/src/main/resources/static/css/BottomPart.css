@@ -1,0 +1,11 @@
+.BottomPart{
+    position: relative;
+    height: 60px;
+    width: 100%;
+    background-color:rgba(159,66,72,0.9);
+    top:0px;
+    left: 0px;
+    text-align: center;
+    font-size: 15px;
+    color: white;
+}
